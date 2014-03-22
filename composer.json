@@ -1,0 +1,15 @@
+{
+    "name": "snowcap/emarsys",
+    "description": "Emarsys RestFull API client",
+    "require": {
+        "guzzle/guzzle": "dev-master"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jérôme Poskin",
+            "email": "jerome@snowcap.be"
+        }
+    ],
+    "minimum-stability": "dev"
+}
