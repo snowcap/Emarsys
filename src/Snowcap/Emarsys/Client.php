@@ -516,12 +516,12 @@ class Client
         try {
             $response = $request->send();
 
-            return $this->getResponse($response);
+            return $this->getResponse($response->json());
         } catch (ClientErrorResponseException $e) {
             $response = $e->getResponse();
-            $result = $this->getResponse($response);
+            $result = $this->getResponse($response->json());
 
-            throw new ServerException($result->replyText, $result->replyCode);
+            throw new ServerException($result->getReplyText(), $result->getReplyCode());
         }
 
     }
@@ -550,12 +550,12 @@ class Client
     }
 
     /**
-     * @param \Guzzle\Http\Message\Response $response
+     * @param array $response
      * @return Response
      */
-    public function getResponse(\Guzzle\Http\Message\Response $response)
+    public function getResponse(array $response)
     {
-        return new Response($response->json());
+        return new Response($response);
     }
 
     /**

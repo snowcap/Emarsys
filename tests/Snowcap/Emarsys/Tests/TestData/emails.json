@@ -1,0 +1,42 @@
+{
+    "replyCode": 0,
+    "replyText": " OK",
+    "data": [
+        {
+            "id": "12345",
+            "root_email": "0",
+            "language": "en",
+            "created": "2011-08-12 18:12:23",
+            "name": "Test1",
+            "status": "3",
+            "api_status": "2",
+            "api_error": "0",
+            "fromemail": "emarsys@emarsys.net",
+            "fromname": "emarsys",
+            "subject": "Test mail",
+            "email_category": "11111",
+            "segment": "22222",
+            "contactlist": "0",
+            "html_source": "Hello $Last Name$. How are you?",
+            "text_source": "Hello $Last Name$ http://login.emarsys.net/u/nrd.php?p= $uid$_$llid$_$cid$_$sid$_2"
+        },
+        {
+            "id": "67890",
+            "root_email": "0",
+            "language": "en",
+            "created": "2011-08-12 18:20:23",
+            "name": "Test2",
+            "status": "3",
+            "api_status": "2",
+            "api_error": "0",
+            "fromemail": "emarsys@emarsys.net",
+            "fromname": "emarsys",
+            "subject": "Test mail",
+            "email_category": "11111",
+            "segment": "22222",
+            "contactlist": "0",
+            "html_source": "Hello $Last Name$. How are you?",
+            "text_source": "Hello $Last Name$ http://login.emarsys.net/u/ nrd.php?p= $uid$_$llid$_$cid$_$sid$_2"
+        }
+    ]
+}

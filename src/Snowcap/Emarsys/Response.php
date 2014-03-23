@@ -7,19 +7,27 @@ use Snowcap\Emarsys\Exception\ClientException;
 
 class Response
 {
+    const REPLY_CODE_OK = 0;
+    const REPLY_CODE_INTERNAL_ERROR = 1;
+    const REPLY_CODE_INVALID_DATA = 10001;
+
     /**
      * @var int
      */
-    public $replyCode;
+    protected $replyCode;
     /**
      * @var string
      */
-    public $replyText;
+    protected $replyText;
     /**
      * @var array
      */
-    public $data = array();
+    protected $data = array();
 
+    /**
+     * @param array $result
+     * @throws Exception\ClientException
+     */
     function __construct(array $result = array())
     {
         if (count($result) > 0) {
@@ -32,5 +40,27 @@ class Response
         }
     }
 
+    /**
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
 
-} 
+    /**
+     * @return int
+     */
+    public function getReplyCode()
+    {
+        return $this->replyCode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getReplyText()
+    {
+        return $this->replyText;
+    }
+}
