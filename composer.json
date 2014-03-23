@@ -2,7 +2,14 @@
     "name": "snowcap/emarsys",
     "description": "Emarsys RestFull API client",
     "require": {
+        "php": ">=5.3.3",
         "guzzle/guzzle": "dev-master"
+    },
+
+    "autoload": {
+        "psr-0": {
+            "Snowcap\\Emarsys": "src/"
+        }
     },
     "license": "MIT",
     "authors": [

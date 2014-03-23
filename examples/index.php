@@ -2,17 +2,38 @@
 
 require_once 'config.php';
 
-use Snowcap\Emarsys\ApiClient;
-use Guzzle\Http\Exception\ClientErrorResponseException;
+use Snowcap\Emarsys\Client;
+use Snowcap\Emarsys\Response;
+
+/**
+ * @param Response $response
+ */
+function testAPI(Response $response)
+{
+    echo PHP_EOL . str_repeat("=", 80) . PHP_EOL;
+    var_dump($response);
+    echo PHP_EOL . str_repeat("=", 80) . PHP_EOL;
+    echo PHP_EOL;
+}
+
+$client = new Client(EMARSYS_API_USERNAME, EMARSYS_API_SECRET);
+
 
 try {
-    $client = new ApiClient(EMARSYS_API_USERNAME, EMARSYS_API_SECRET);
+    // Get a list of emails
+    //testAPI($client->getEmails());
 
-    $response = $client->getLanguage();
-    $status = $response->getStatusCode();
+    // Get a list of emails with specific status
+    //testAPI($client->getEmails(ApiClient::EMAIL_STATUS_READY));
 
-    var_dump($response);
-} catch (ClientErrorResponseException $e) {
-    echo $e->getRequest() . "\n";
-    echo $e->getResponse() . "\n";
+    // Get a list of emails for specific mailing list
+    //testAPI($client->getEmails(null, 123));
+
+    // Get a list of emails with specific status and for specific mailing list
+    //testAPI($client->getEmails(ApiClient::EMAIL_STATUS_READY, 123));
+
+    // Get available languages
+    testAPI($client->getLanguages());
+} catch (\Exception $e) {
+    echo $e;
 }
