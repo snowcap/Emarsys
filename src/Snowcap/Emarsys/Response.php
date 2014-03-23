@@ -9,6 +9,7 @@ class Response
 {
     const REPLY_CODE_OK = 0;
     const REPLY_CODE_INTERNAL_ERROR = 1;
+    const REPLY_CODE_INVALID_STATUS = 6003;
     const REPLY_CODE_INVALID_DATA = 10001;
 
     /**

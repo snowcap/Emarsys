@@ -15,6 +15,17 @@
         </testsuite>
     </testsuites>
 
+    <filter>
+        <whitelist>
+            <directory>./src</directory>
+            <exclude>
+                <directory>./examples</directory>
+                <directory>./tests</directory>
+                <directory>./vendor</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+
     <php>
         <const name="EMARSYS_API_USERNAME" value="your_username"/>
         <const name="EMARSYS_API_SECRET" value="your_secret"/>

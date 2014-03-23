@@ -6,6 +6,7 @@ use Guzzle\Http\Client as GuzzleClient;
 use Guzzle\Http\Exception\ClientErrorResponseException;
 use Guzzle\Http\Message\RequestInterface;
 
+use Snowcap\Emarsys\Exception\ClientException;
 use Snowcap\Emarsys\Exception\ServerException;
 
 class Client
@@ -222,12 +223,47 @@ class Client
     /**
      * Creates an email in eMarketing Suite and assigns it the respective parameters.
      *
-     * @param array $data
+     * @param string $language
+     * @param string $name
+     * @param string $fromEmail
+     * @param string $fromName
+     * @param string $subject
+     * @param string $emailCategory
+     * @param string $htmlSource
+     * @param string $textSource
+     * @param int|null $segment
+     * @param int|null $contactList
+     * @param int|null $unsubscribe
+     * @param int|null $browse
+     * @throws Exception\ClientException
      * @return Response
      */
-    public function createEmail($data)
+    public function createEmail($language, $name, $fromEmail, $fromName, $subject, $emailCategory, $htmlSource, $textSource, $segment = null, $contactList = null, $unsubscribe = null, $browse = null)
     {
-        return $this->send(RequestInterface::POST, 'email', array(), $data);
+        $data = array(
+            'language' => $language,
+            'name' => $name,
+            'fromemail' => $fromEmail,
+            'fromname' => $fromName,
+            'subject' => $subject,
+            'email_category' => $emailCategory,
+            'html_source' => $htmlSource,
+            'text_source' => $textSource,
+        );
+        if (empty($segment) && empty($contactList)) {
+            throw new ClientException('Missing segment or contactList');
+        }
+        $data['segment'] = $segment ?: 0;
+        $data['contactlist'] = $contactList ?: 0;
+
+        if (null !== $unsubscribe) {
+            $data['unsubscribe'] = $unsubscribe;
+        }
+        if (null !== $browse) {
+            $data['browse'] = $browse;
+        }
+
+        return $this->send(RequestInterface::POST, 'email', array(), (object) $data);
     }
 
     /**
