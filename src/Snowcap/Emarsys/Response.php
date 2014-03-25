@@ -42,11 +42,27 @@ class Response
     }
 
     /**
+     * @param array $data
+     */
+    public function setData($data)
+    {
+        $this->data = $data;
+    }
+
+    /**
      * @return array
      */
     public function getData()
     {
         return $this->data;
+    }
+
+    /**
+     * @param int $replyCode
+     */
+    public function setReplyCode($replyCode)
+    {
+        $this->replyCode = $replyCode;
     }
 
     /**
@@ -58,10 +74,19 @@ class Response
     }
 
     /**
+     * @param string $replyText
+     */
+    public function setReplyText($replyText)
+    {
+        $this->replyText = $replyText;
+    }
+
+    /**
      * @return string
      */
     public function getReplyText()
     {
         return $this->replyText;
     }
+
 }

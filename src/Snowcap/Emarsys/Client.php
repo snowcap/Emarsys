@@ -46,11 +46,17 @@ class Client
     protected $headers = array();
 
     /**
-     * @param string $username
-     * @param string $secret
-     * @param string|null $baseUrl
+     * @var array
      */
-    public function __construct($username, $secret, $baseUrl = null)
+    protected $fieldsMapping = array();
+
+    /**
+     * @param string $username The username requested by the Emarsys API
+     * @param string $secret The secret requested by the Emarsys API
+     * @param string $baseUrl Overrides the default baseUrl if needed
+     * @param array $fieldsMapping Overrides the default fields mapping if needed
+     */
+    public function __construct($username, $secret, $baseUrl = null, $fieldsMapping = array())
     {
         $this->username = $username;
         $this->secret = $secret;
@@ -59,7 +65,64 @@ class Client
             $this->baseUrl = $baseUrl;
         }
 
+        if (count($fieldsMapping) > 0) {
+            $this->fieldsMapping = $fieldsMapping;
+        } else {
+            $this->fieldsMapping = parse_ini_file(__DIR__  . '/ini/fields.ini', true);
+        }
+
         $this->client = new GuzzleClient($this->baseUrl);
+    }
+
+    /**
+     * Add your custom fields mapping
+     * This is useful if you want to use string identifiers instead of ids when you play with contacts
+     *
+     * Example:
+     *  $mapping = array(
+     *      'myCustomField' => 7147,
+     *      'myCustomField2' => 7148,
+     *  );
+     *
+     * @param array $mapping
+     */
+    public function addFieldsMapping($mapping = array())
+    {
+        $this->fieldsMapping = array_merge($this->fieldsMapping, $mapping);
+    }
+
+    /**
+     * Get a field id from a field name (specified in the fields mapping)
+     *
+     * @param string $fieldName
+     * @return int
+     * @throws Exception\ClientException
+     */
+    public function getFieldId($fieldName)
+    {
+        if (isset($this->fieldsMapping[$fieldName])) {
+            return (int)$this->fieldsMapping[$fieldName];
+        }
+
+        throw new ClientException('Unrecognized field name');
+    }
+
+    /**
+     * Get a field name from a field id (specified in the fields mapping)
+     *
+     * @param int $fieldId
+     * @return string
+     * @throws Exception\ClientException
+     */
+    public function getFieldName($fieldId)
+    {
+        $fieldName = array_search($fieldId, $this->fieldsMapping);
+
+        if ($fieldName) {
+            return $fieldName;
+        }
+
+        throw new ClientException('Unrecognized field id');
     }
 
     /**
@@ -85,7 +148,7 @@ class Client
      */
     public function createContact($data)
     {
-        return $this->send(RequestInterface::POST, 'contact', array(), $data);
+        return $this->send(RequestInterface::POST, 'contact', array(), $this->mapFieldsToIds($data));
     }
 
     /**
@@ -96,7 +159,7 @@ class Client
      */
     public function updateContact($data)
     {
-        return $this->send(RequestInterface::PUT, 'contact', array(), $data);
+        return $this->send(RequestInterface::PUT, 'contact', array(), $this->mapFieldsToIds($data));
     }
 
     /**
@@ -104,11 +167,20 @@ class Client
      *
      * @param string $fieldId
      * @param string $fieldValue
+     * @param bool $useFieldMapping
      * @return Response
      */
-    public function getContact($fieldId, $fieldValue)
+    public function getContact($fieldId, $fieldValue, $useFieldMapping = true)
     {
-        return $this->send(RequestInterface::GET, sprintf('contact/%s=%s', $fieldId, $fieldValue));
+        $response = $this->send(RequestInterface::GET, sprintf('contact/%s=%s', $fieldId, $fieldValue));
+
+        if ($useFieldMapping) {
+            $data = $response->getData();
+            $data['result'] = $this->mapIdsToFields($data['result']);
+            $response->setData($data);
+        }
+
+        return $response;
     }
 
     /**
@@ -605,5 +677,47 @@ class Client
         );
 
         return $signature;
+    }
+
+    /**
+     * Convert field names to field ids
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function mapFieldsToIds(array $data)
+    {
+        $mappedData = array();
+
+        foreach($data as $name => $value) {
+            if (is_numeric($name)) {
+                $mappedData[(int)$name] = $value;
+            } else {
+                $mappedData[$this->getFieldId($name)] = $value;
+            }
+        }
+
+        return $mappedData;
+    }
+
+    /**
+     * Convert field ids to field names
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function mapIdsToFields(array $data)
+    {
+        $mappedData = array();
+
+        foreach($data as $id => $value) {
+            if (is_numeric($id)) {
+                $mappedData[$this->getFieldName($id)] = $value;
+            } else {
+                $mappedData[$id] = $value;
+            }
+        }
+
+        return $mappedData;
     }
 }
