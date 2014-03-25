@@ -55,7 +55,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNotEmpty($response->getData());
 
-        foreach($response->getData() as $data) {
+        foreach ($response->getData() as $data) {
             $this->assertArrayHasKey('id', $data);
             $this->assertArrayHasKey('name', $data);
             $this->assertArrayHasKey('status', $data);
@@ -70,37 +70,25 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $expectedResponse = new Response($this->createExpectedResponse('create'));
         $this->client->expects($this->any())->method('send')->will($this->returnValue($expectedResponse));
 
-        $response = $this->client->createEmail(
-            'test api 010',
-            'en',
-            'subject here',
-            'sender email',
-            'sender@example.com',
-            '17',
-            '<html>Hello $First Name$,... </html>',
-            'email text',
-            1121,
-            null,
-            1,
-            0
+        $data = array(
+            'language' => 'en',
+            'name' => 'test api 010',
+            'fromemail' => 'sender@example.com',
+            'fromname' => 'sender email',
+            'subject' => 'subject here',
+            'email_category' => '17',
+            'html_source' => '<html>Hello $First Name$,... </html>',
+            'text_source' => 'email text',
+            'segment' => 1121,
+            'contactlist' => 0,
+            'unsubscribe' => 1,
+            'browse' => 0,
         );
+
+        $response = $this->client->createEmail($data);
 
         $this->assertEquals(Response::REPLY_CODE_OK, $response->getReplyCode());
         $this->assertArrayHasKey('id', $response->getData());
-
-        $this->setExpectedException('\Snowcap\Emarsys\Exception\ClientException', 'Missing segment or contactList');
-
-        $this->client->createEmail(
-            'test api 010',
-            'en',
-            'subject here',
-            'sender email',
-            'sender@example.com',
-            '17',
-            '<html>Hello $First Name$,... </html>',
-            'email text'
-        );
-
     }
 
     /**

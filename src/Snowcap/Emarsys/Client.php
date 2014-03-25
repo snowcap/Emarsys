@@ -25,7 +25,7 @@ class Client
     /**
      * @var string
      */
-    protected $baseUrl = 'https://www1.emarsys.net/api/v2/';
+    protected $baseUrl = 'https://suite6.emarsys.net/api/v2/';
     /**
      * @var string
      */
@@ -74,7 +74,12 @@ class Client
 
     /**
      * Creates one or more new contacts/recipients.
-     *
+     * Example :
+     *  $data = array(
+     *      'key_id' => '3',
+     *      '3' => recipient@example.com',
+     *      'source_id' => '123',
+     *  );
      * @param array $data
      * @return Response
      */
@@ -222,48 +227,28 @@ class Client
 
     /**
      * Creates an email in eMarketing Suite and assigns it the respective parameters.
+     * Example :
+     *  $data = array(
+     *      'language' => 'en',
+     *      'name' => 'test api 010',
+     *      'fromemail' => 'sender@example.com',
+     *      'fromname' => 'sender email',
+     *      'subject' => 'subject here',
+     *      'email_category' => '17',
+     *      'html_source' => '<html>Hello $First Name$,... </html>',
+     *      'text_source' => 'email text',
+     *      'segment' => 1121,
+     *      'contactlist' => 0,
+     *      'unsubscribe' => 1,
+     *      'browse' => 0,
+     *  );
      *
-     * @param string $language
-     * @param string $name
-     * @param string $fromEmail
-     * @param string $fromName
-     * @param string $subject
-     * @param string $emailCategory
-     * @param string $htmlSource
-     * @param string $textSource
-     * @param int|null $segment
-     * @param int|null $contactList
-     * @param int|null $unsubscribe
-     * @param int|null $browse
-     * @throws Exception\ClientException
+     * @param array|object $data
      * @return Response
      */
-    public function createEmail($language, $name, $fromEmail, $fromName, $subject, $emailCategory, $htmlSource, $textSource, $segment = null, $contactList = null, $unsubscribe = null, $browse = null)
+    public function createEmail($data)
     {
-        $data = array(
-            'language' => $language,
-            'name' => $name,
-            'fromemail' => $fromEmail,
-            'fromname' => $fromName,
-            'subject' => $subject,
-            'email_category' => $emailCategory,
-            'html_source' => $htmlSource,
-            'text_source' => $textSource,
-        );
-        if (empty($segment) && empty($contactList)) {
-            throw new ClientException('Missing segment or contactList');
-        }
-        $data['segment'] = $segment ?: 0;
-        $data['contactlist'] = $contactList ?: 0;
-
-        if (null !== $unsubscribe) {
-            $data['unsubscribe'] = $unsubscribe;
-        }
-        if (null !== $browse) {
-            $data['browse'] = $browse;
-        }
-
-        return $this->send(RequestInterface::POST, 'email', array(), (object) $data);
+        return $this->send(RequestInterface::POST, 'email', array(), (object)$data);
     }
 
     /**
@@ -419,12 +404,11 @@ class Client
     /**
      * Returns a list of fields (including custom fields and vouchers) which can be used to personalize content.
      *
-     * @param array $data
      * @return Response
      */
-    public function getFields($data)
+    public function getFields()
     {
-        return $this->send(RequestInterface::GET, 'field', array(), $data);
+        return $this->send(RequestInterface::GET, 'field');
     }
 
     /**
@@ -540,14 +524,14 @@ class Client
      * @param string $method
      * @param string|null $uri
      * @param array $headers
-     * @param string|null $body
+     * @param string|resource|array $body
      * @param array $options
      * @return Response
      * @throws ServerException
      */
     public function send($method = 'GET', $uri = null, $headers = array(), $body = null, $options = array())
     {
-        $request = $this->createRequest($method, $uri, $headers, $body, $options);
+        $request = $this->createRequest($method, $uri, $headers, $body ? json_encode($body) : null, $options);
 
         try {
             $response = $request->send();
