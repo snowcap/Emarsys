@@ -167,20 +167,11 @@ class Client
      *
      * @param string $fieldId
      * @param string $fieldValue
-     * @param bool $useFieldMapping
      * @return Response
      */
-    public function getContact($fieldId, $fieldValue, $useFieldMapping = true)
+    public function getContactId($fieldId, $fieldValue)
     {
-        $response = $this->send(RequestInterface::GET, sprintf('contact/%s=%s', $fieldId, $fieldValue));
-
-        if ($useFieldMapping) {
-            $data = $response->getData();
-            $data['result'] = $this->mapIdsToFields($data['result']);
-            $response->setData($data);
-        }
-
-        return $response;
+        return $this->send(RequestInterface::GET, sprintf('contact/%s=%s', $fieldId, $fieldValue));
     }
 
     /**
@@ -208,12 +199,29 @@ class Client
     /**
      * Returns all data associated with a contact.
      *
+     * Example:
+     *
+     *  $data = array(
+     *      'keyId' => 3, // contact element used as a key to select the contacts.To use the internalID, pass"id" to the "keyId" parameter.
+     *      'keyValues' => array('example@example.com', 'example2@example.com') // an array containing contactIDs or values of the column used to select contacts
+     *  );
+     *
+     *
      * @param array $data
+     * @param bool $useFieldMapping
      * @return Response
      */
-    public function getContactData($data)
+    public function getContactData($data, $useFieldMapping = true)
     {
-        return $this->send(RequestInterface::GET, 'contact/getdata', array(), $data);
+        $response = $this->send(RequestInterface::GET, 'contact/getdata', array(), $data);
+
+        if ($useFieldMapping) {
+            $data = $response->getData();
+            $data['result'] = $this->mapIdsToFields($data['result']);
+            $response->setData($data);
+        }
+
+        return $response;
     }
 
     /**
@@ -487,12 +495,11 @@ class Client
      * Returns the choice options of a field.
      *
      * @param string $fieldId
-     * @param array $data
      * @return Response
      */
-    public function getFieldChoices($fieldId, $data)
+    public function getFieldChoices($fieldId)
     {
-        return $this->send(RequestInterface::GET, sprintf('field/%s/choice', $fieldId), array(), $data);
+        return $this->send(RequestInterface::GET, sprintf('field/%s/choice', $fieldId));
     }
 
     /**

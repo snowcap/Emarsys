@@ -1,7 +1,7 @@
 Emarsys, PHP HTTP client for Emarsys webservice
 ================================================
 
-Emarsys is a PHP HTTP client created based on Emarsys web service documentation.
+Emarsys is a PHP HTTP client based on Emarsys web service documentation.
 
 This is a WIP and should not be used in production without further tests
 
