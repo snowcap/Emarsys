@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Copy/Paste the config.php.dist to config.php and set the right settings
+ */
+
 require_once 'config.php';
 
 use Snowcap\Emarsys\Client;

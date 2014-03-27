@@ -1,1 +1,6 @@
 <?php
+
+require_once '../vendor/autoload.php';
+
+define('EMARSYS_API_USERNAME', 'beonweb_babyfrance001');
+define('EMARSYS_API_SECRET', 'mxJJ6uQGRsJtitnkHQHs');
