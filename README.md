@@ -156,7 +156,7 @@ This matches the json response sent by the Emarsys API.
 The reply code and reply text are the official reply returned by the Emarsys API.
 The data become an associative array representing the actual data (read the official Emarsys documentation, check the inline documentation in the code or var_dump the response)
 
-## Exceptions
+### Exceptions
 
 The client throws 2 types of exceptions
 
