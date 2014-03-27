@@ -123,20 +123,20 @@ class Client
     /**
      * Returns a field id from a field name (specified in the fields mapping)
      *
-     * @param string $fieldName
+     * @param string|int $field
      * @return int
      * @throws Exception\ClientException
      */
-    public function getFieldId($fieldName)
+    public function getFieldId($field)
     {
-        if (is_numeric($fieldName)) {
-            return $fieldName;
+        if (is_numeric($field)) {
+            return (int)$field;
         }
-        if (isset($this->fieldsMapping[$fieldName])) {
-            return (int)$this->fieldsMapping[$fieldName];
+        if (isset($this->fieldsMapping[$field])) {
+            return (int)$this->fieldsMapping[$field];
         }
 
-        throw new ClientException(sprintf('Unrecognized field name "%s"', $fieldName));
+        throw new ClientException(sprintf('Unrecognized field name "%s"', $field));
     }
 
     /**
@@ -157,39 +157,48 @@ class Client
     }
 
     /**
-     * Returns a choice id from a choice name (specified in the choices mapping)
+     * Returns a choice id for a field from a choice name (specified in the choices mapping)
      *
-     * @param string $choiceName
-     * @return int
+     * @param string|int $field
+     * @param string|int $choice
      * @throws Exception\ClientException
+     * @return int
      */
-    public function getChoiceId($choiceName)
+    public function getChoiceId($field, $choice)
     {
-        if (is_numeric($choiceName)) {
-            return $choiceName;
+        if (is_numeric($choice)) {
+            return (int)$choice;
         }
-        if (isset($this->choicesMapping[$choiceName])) {
-            return (int)$this->choicesMapping[$choiceName];
+        if (!isset($this->choicesMapping[$this->getFieldName($field)])) {
+            throw new ClientException(sprintf('Unrecognized field "%s" for choice "%s"', $field, $choice));
+        }
+        if (!isset($this->choicesMapping[$this->getFieldName($field)][$choice])) {
+            throw new ClientException(sprintf('Unrecognized choice "%s" for field "%s"', $choice, $field));
         }
 
-        throw new ClientException(sprintf('Unrecognized choice name "%s"', $choiceName));
+        return (int)$this->choicesMapping[$this->getFieldName($field)][$choice];
     }
 
     /**
-     * Returns a choice name from a choice id (specified in the choices mapping) or the choice id if no mapping is found
+     * Returns a choice name for a field from a choice id (specified in the choices mapping) or the choice id if no mapping is found
      *
-     * @param int $fieldId
+     * @param string|int $field
+     * @param int $choiceId
+     * @throws Exception\ClientException
      * @return string|int
      */
-    public function getChoiceName($fieldId)
+    public function getChoiceName($field, $choiceId)
     {
-        $fieldName = array_search($fieldId, $this->fieldsMapping);
+        if(!isset($this->choicesMapping[$this->getFieldId($field)])) {
+            throw new ClientException(sprintf('Unrecognized field "%s" for choice id "%s"', $field, $choiceId));
+        }
+        $field = array_search($choiceId, $this->fieldsMapping[$this->getFieldId($field)]);
 
-        if ($fieldName) {
-            return $fieldName;
+        if ($field) {
+            return $field;
         }
 
-        return $fieldId;
+        return $choiceId;
     }
 
     /**
@@ -774,7 +783,7 @@ class Client
     {
         $mappedData = array();
 
-        foreach($data as $name => $value) {
+        foreach ($data as $name => $value) {
             if (is_numeric($name)) {
                 $mappedData[(int)$name] = $value;
             } else {
@@ -795,7 +804,7 @@ class Client
     {
         $mappedData = array();
 
-        foreach($data as $id => $value) {
+        foreach ($data as $id => $value) {
             if (is_numeric($id)) {
                 $mappedData[$this->getFieldName($id)] = $value;
             } else {
@@ -812,9 +821,23 @@ class Client
      */
     protected function parseIniFile($filename)
     {
-        $data = parse_ini_file(__DIR__  . '/ini/' . $filename, true);
-        foreach($data as $key => $value) {
-            $data[$key] = (int)$value;
+        $data = parse_ini_file(__DIR__ . '/ini/' . $filename, true);
+
+        return $this->castIniFileValues($data);
+    }
+
+    /**
+     * @param mixed $data
+     * @return mixed
+     */
+    protected function castIniFileValues($data)
+    {
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $data[$key] = $this->castIniFileValues($value);
+            } elseif (is_numeric($value)) {
+                $data[$key] = (int)$value;
+            }
         }
 
         return $data;
