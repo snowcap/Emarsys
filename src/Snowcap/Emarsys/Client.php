@@ -51,12 +51,18 @@ class Client
     protected $fieldsMapping = array();
 
     /**
+     * @var array
+     */
+    protected $choicesMapping = array();
+
+    /**
      * @param string $username The username requested by the Emarsys API
      * @param string $secret The secret requested by the Emarsys API
      * @param string $baseUrl Overrides the default baseUrl if needed
      * @param array $fieldsMapping Overrides the default fields mapping if needed
+     * @param array $choicesMapping Overrides the default choices mapping if needed
      */
-    public function __construct($username, $secret, $baseUrl = null, $fieldsMapping = array())
+    public function __construct($username, $secret, $baseUrl = null, $fieldsMapping = array(), $choicesMapping = array())
     {
         $this->username = $username;
         $this->secret = $secret;
@@ -68,7 +74,13 @@ class Client
         if (count($fieldsMapping) > 0) {
             $this->fieldsMapping = $fieldsMapping;
         } else {
-            $this->fieldsMapping = parse_ini_file(__DIR__  . '/ini/fields.ini', true);
+            $this->fieldsMapping = $this->parseIniFile('fields.ini');
+        }
+
+        if (count($choicesMapping) > 0) {
+            $this->choicesMapping = $choicesMapping;
+        } else {
+            $this->choicesMapping = $this->parseIniFile('choices.ini');
         }
 
         $this->client = new GuzzleClient($this->baseUrl);
@@ -76,7 +88,7 @@ class Client
 
     /**
      * Add your custom fields mapping
-     * This is useful if you want to use string identifiers instead of ids when you play with contacts
+     * This is useful if you want to use string identifiers instead of ids when you play with contacts fields
      *
      * Example:
      *  $mapping = array(
@@ -92,7 +104,24 @@ class Client
     }
 
     /**
-     * Get a field id from a field name (specified in the fields mapping)
+     * Add your custom field choices mapping
+     * This is useful if you want to use string identifiers instead of ids when you play with contacts field choices
+     *
+     * Example:
+     *  $mapping = array(
+     *      'myCustomChoice' => 1,
+     *      'myCustomChoice2' => 2,
+     *  );
+     *
+     * @param array $mapping
+     */
+    public function addChoicesMapping($mapping = array())
+    {
+        $this->choicesMapping = array_merge($this->choicesMapping, $mapping);
+    }
+
+    /**
+     * Returns a field id from a field name (specified in the fields mapping)
      *
      * @param string $fieldName
      * @return int
@@ -100,19 +129,21 @@ class Client
      */
     public function getFieldId($fieldName)
     {
+        if (is_numeric($fieldName)) {
+            return $fieldName;
+        }
         if (isset($this->fieldsMapping[$fieldName])) {
             return (int)$this->fieldsMapping[$fieldName];
         }
 
-        throw new ClientException('Unrecognized field name');
+        throw new ClientException(sprintf('Unrecognized field name "%s"', $fieldName));
     }
 
     /**
-     * Get a field name from a field id (specified in the fields mapping)
+     * Returns a field name from a field id (specified in the fields mapping) or the field id if no mapping is found
      *
      * @param int $fieldId
-     * @return string
-     * @throws Exception\ClientException
+     * @return string|int
      */
     public function getFieldName($fieldId)
     {
@@ -122,7 +153,43 @@ class Client
             return $fieldName;
         }
 
-        throw new ClientException('Unrecognized field id');
+        return $fieldId;
+    }
+
+    /**
+     * Returns a choice id from a choice name (specified in the choices mapping)
+     *
+     * @param string $choiceName
+     * @return int
+     * @throws Exception\ClientException
+     */
+    public function getChoiceId($choiceName)
+    {
+        if (is_numeric($choiceName)) {
+            return $choiceName;
+        }
+        if (isset($this->choicesMapping[$choiceName])) {
+            return (int)$this->choicesMapping[$choiceName];
+        }
+
+        throw new ClientException(sprintf('Unrecognized choice name "%s"', $choiceName));
+    }
+
+    /**
+     * Returns a choice name from a choice id (specified in the choices mapping) or the choice id if no mapping is found
+     *
+     * @param int $fieldId
+     * @return string|int
+     */
+    public function getChoiceName($fieldId)
+    {
+        $fieldName = array_search($fieldId, $this->fieldsMapping);
+
+        if ($fieldName) {
+            return $fieldName;
+        }
+
+        return $fieldId;
     }
 
     /**
@@ -167,11 +234,20 @@ class Client
      *
      * @param string $fieldId
      * @param string $fieldValue
+     * @throws Exception\ClientException
      * @return Response
      */
     public function getContactId($fieldId, $fieldValue)
     {
-        return $this->send(RequestInterface::GET, sprintf('contact/%s=%s', $fieldId, $fieldValue));
+        $response = $this->send(RequestInterface::GET, sprintf('contact/%s=%s', $fieldId, $fieldValue));
+
+        $data = $response->getData();
+
+        if (isset($data['id'])) {
+            return $data['id'];
+        }
+
+        throw new ClientException('Missing "id" in response');
     }
 
     /**
@@ -208,16 +284,18 @@ class Client
      *
      *
      * @param array $data
-     * @param bool $useFieldMapping
+     * @param bool $responseWithFieldNames Select true if you want to map field ids to field names
      * @return Response
      */
-    public function getContactData($data, $useFieldMapping = true)
+    public function getContactData($data, $responseWithFieldNames = true)
     {
-        $response = $this->send(RequestInterface::GET, 'contact/getdata', array(), $data);
+        $response = $this->send(RequestInterface::POST, 'contact/getdata', array(), $data);
 
-        if ($useFieldMapping) {
+        if ($responseWithFieldNames) {
             $data = $response->getData();
-            $data['result'] = $this->mapIdsToFields($data['result']);
+            foreach ($data['result'] as $key => $contact) {
+                $data['result'][$key] = $this->mapIdsToFields($contact);
+            }
             $response->setData($data);
         }
 
@@ -494,12 +572,12 @@ class Client
     /**
      * Returns the choice options of a field.
      *
-     * @param string $fieldId
+     * @param string $fieldId Field ID or custom field name (available in fields mapping)
      * @return Response
      */
     public function getFieldChoices($fieldId)
     {
-        return $this->send(RequestInterface::GET, sprintf('field/%s/choice', $fieldId));
+        return $this->send(RequestInterface::GET, sprintf('field/%s/choice', $this->getFieldId($fieldId)));
     }
 
     /**
@@ -726,5 +804,19 @@ class Client
         }
 
         return $mappedData;
+    }
+
+    /**
+     * @param string $filename
+     * @return array
+     */
+    protected function parseIniFile($filename)
+    {
+        $data = parse_ini_file(__DIR__  . '/ini/' . $filename, true);
+        foreach($data as $key => $value) {
+            $data[$key] = (int)$value;
+        }
+
+        return $data;
     }
 }
