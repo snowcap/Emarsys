@@ -16,6 +16,53 @@ function testAPI(Response $response)
     echo PHP_EOL;
 }
 
+/**
+ * Try to create or update a contact
+ *
+ * @param \Snowcap\Emarsys\Client $client
+ * @return \Snowcap\Emarsys\Response
+ * @throws Exception
+ * @throws \Snowcap\Emarsys\Exception\ServerException
+ */
+function sendContact(Client $client)
+{
+    $data = [];
+    try {
+        $data = [
+            'email' => 'johndoe@gmail.com',
+            'gender' => $client->getChoiceId('gender', 'male'),
+            'salutation' => $client->getChoiceId('salutation', 'mr'),
+            'firstName' => 'John',
+            'lastName' => 'Doe',
+            'birthDate' => '2014-03-27',
+            'address' => 'Forgotten street 85B',
+            'zip' => '1000',
+            'city' => 'Brussels',
+            'country' => 17,
+            'language' => 3,
+        ];
+
+        // Check if the user exists : this throws an exception if the user is not found
+        $client->getContactId($client->getFieldId('email'), 'johndoe@gmail.com');
+
+        // If no exception is thrown, update the contact
+        $response = $client->updateContact($data);
+    } catch(\Snowcap\Emarsys\Exception\ServerException $e) {
+        switch($e->getCode()) {
+            case Response::REPLY_CODE_CONTACT_NOT_FOUND:
+                // If the contact is not found, create it
+                $response = $client->createContact($data);
+                break;
+            default:
+                throw $e;
+                break;
+        }
+    }
+
+    return $response;
+}
+
+
 $client = new Client(EMARSYS_API_USERNAME, EMARSYS_API_SECRET);
 
 
@@ -27,7 +74,7 @@ try {
     //testAPI($client->getFields());
 
     // Create basic contact
-    testAPI($client->createContact(array('3' => 'jerome@snowcap.be')));
+    testAPI(sendContact($client));
 
     // Get a list of emails
     //testAPI($client->getEmails());
