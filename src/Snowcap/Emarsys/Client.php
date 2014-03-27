@@ -109,8 +109,10 @@ class Client
      *
      * Example:
      *  $mapping = array(
-     *      'myCustomChoice' => 1,
-     *      'myCustomChoice2' => 2,
+     *      'myCustomField' => array(
+     *          'myCustomChoice' => 1,
+     *          'myCustomChoice2' => 2,
+     *      )
      *  );
      *
      * @param array $mapping
