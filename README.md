@@ -1,9 +1,11 @@
 Emarsys, PHP HTTP client for Emarsys webservice
 ================================================
 
-Emarsys is a PHP HTTP client based on Emarsys web service documentation.
+Emarsys is a PHP HTTP client based on the official Emarsys web service documentation.
 
-This is a WIP and should not be used in production without further tests
+At the time of writing, __only methods related to contacts are production ready__.
+
+__All the other methods__ have been implemented following the documentation but __not yet tested__.
 
 ### Installing via Composer
 
@@ -25,7 +27,7 @@ require 'vendor/autoload.php';
 
 ### Basics
 
-To use the client, you just need to load the client with your credentials
+To use the client, you just need to instanciate a new one with your credentials
 
 ```php
 define('EMARSYS_API_USERNAME', 'your_username');
@@ -34,7 +36,7 @@ define('EMARSYS_API_SECRET', 'your_secret');
 $client = new Client(EMARSYS_API_USERNAME, EMARSYS_API_SECRET);
 ```
 
-At that point, you have access to all the methods implemented by the Emarsys API
+At this point, you have access to all the methods implemented by the Emarsys API
 
 For example :
 
@@ -49,26 +51,28 @@ $response = $client->createContact(array(3 => 'example@example.com'));
 $response = $client->createContact(array(1 => 'John', 2 => 'Doe', 3 => 'example@example.com'));
 ```
 
-As explained in the Emarsys documentation, each field has an ID
+You can find detailed examples in the `examples` directory.
+
+### Custom field mapping
+
+As explained in the Emarsys documentation, each field is referenced by an ID.
 
 You can do a `$response = $client->getFields();` to get the complete list with their ids and names.
 
-### Custom mapping
-
-Dealing with IDs is not always the easiest way to work.
+But dealing with IDs is not always the easiest way to work.
 
 So, extra methods have been implemented to handle custom mapping.
 
-First of all, a default non-exhaustive mapping has been set for the Emarsys pre-defined fields and choices.
-You can find them in `src/Snowcap/Emarsys/ini/fields.ini` and `src/Snowcap/Emarsys/ini/choices.ini`.
+First of all, a default (non-exhaustive) mapping has been set for the Emarsys pre-defined fields.
+You can find it in `src/Snowcap/Emarsys/ini/fields.ini`
 
-But you can add your own by calling 
+But you can add your own by calling :
 
 ```php
 $client->addFieldsMapping(array('petName' => 7849, 'twitter' => 7850));`
 ```
 
-In that way, the default mapping and your own are merged and become available instantly as replacement of these boring IDs.
+In that way, the default mapping and your own are merged and become available instantly as a replacement of these boring IDs.
 
 It means that you can use both IDs and custom names to reference fields, so the two samples below do the same :
 
@@ -86,10 +90,81 @@ $fieldName= $client->getFieldName(1);
 // will return 'firstName';
 ```
 
-Last but not least, you can completely overrid the default mappings by passing an array as a third argument of the constructor.
+Last but not least, you can completely override the default mappings by passing an array as the third argument of the constructor.
 
 ```php
-$client = new Client(EMARSYS_API_USERNAME, EMARSYS_API_SECRET, array('MyAwsomeFirstname' => 1, 'MyAwsomeLastname' => 2));
+$client = new Client(EMARSYS_API_USERNAME, EMARSYS_API_SECRET, array('firstName' => 1, 'lastName' => 2));
 ```
 
-You just have to refer to the documentation or the `getFields()` method to identify the right IDs.
+You just have to refer to the official Emarsys documentation or the `getFields()` method to identify the right IDs.
+
+### Custom field choice mapping
+
+When we use choice fields, each choice has its own ID, like a field.
+
+You can do a `$response = $client->getFieldChoices(5);` to get the complete list of choices with their ids and names for a specific field (the gender for instance [5]).
+
+But dealing with IDs is still not the easiest way to work.
+
+So, extra methods have been implemented to handle custom mapping.
+
+First of all, a default (non-exhaustive) mapping has been set for the Emarsys pre-defined field choices.
+You can find it in `src/Snowcap/Emarsys/ini/choices.ini`
+
+But you can add your own by calling :
+
+```php
+$client->addChoicesMapping(array('gender' => array('male' => 1, 'female' => 2)));`
+```
+
+It means that you can use both IDs and custom names to reference field choices, so the two samples below do the same :
+
+```php
+$response = $client->getFieldChoices(5);
+$response = $client->getFieldChoices('gender');
+```
+
+You also have access to additional methods to retrieve a particular ID by name and vice versa.
+
+```php
+$choiceId = $client->getChoiceId('gender', 'male');
+// will return 1;
+$choiceName= $client->getChoiceName('gender', 1);
+// will return 'male';
+```
+
+You can of course override  completely the default mappings by passing an array as the fourth argument of the constructor.
+
+```php
+$client = new Client(EMARSYS_API_USERNAME, EMARSYS_API_SECRET, array(), array('gender' => array('male' => 1, 'female' => 2)));
+```
+
+You just have to refer to the official Emarsys documentation or the `getFieldChoices()` method to identify the right IDs.
+
+### The response
+
+Almost every methods implementing the API return a new Response object.
+
+This response is a simple class with three properties :
+
+* a _replyCode_
+* a _replyText_
+* and the _data_
+
+This matches the json response sent by the Emarsys API.
+
+The reply code and reply text are the official reply returned by the Emarsys API.
+The data become an associative array representing the actual data (read the official Emarsys documentation, check the inline documentation in the code or var_dump the response)
+
+## Exceptions
+
+The client throws 2 types of exceptions
+
+* a _ClientException_ : which is related to wrong usage of this client
+* a _ServerException_ : which is related to wrong usage of the API itself
+ 
+The _ServerException_ is carrying the original reply text and reply code sent by the API.
+
+Some of the reply codes have already been handled as constants, but not all.
+
+This could be very useful, for example : we could check the exception code to see if the contact was not found, then we could create it. See the `examples` directory to see it in action.
