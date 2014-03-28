@@ -30,9 +30,9 @@ function testAPI(Response $response)
  */
 function sendContact(Client $client)
 {
-    $data = [];
+    $data = array();
     try {
-        $data = [
+        $data = array(
             'email' => 'johndoe@gmail.com',
             'gender' => $client->getChoiceId('gender', 'male'),
             'salutation' => $client->getChoiceId('salutation', 'mr'),
@@ -44,7 +44,7 @@ function sendContact(Client $client)
             'city' => 'Brussels',
             'country' => 17,
             'language' => 3,
-        ];
+        );
 
         // Check if the user exists : this throws an exception if the user is not found
         $client->getContactId($client->getFieldId('email'), 'johndoe@gmail.com');
