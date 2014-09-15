@@ -92,6 +92,20 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers \Snowcap\Emarsys\Client::getContactId
+     */
+    public function testGetContactIdSuccess()
+    {
+        $expectedResponse = new Response($this->createExpectedResponse('getContactId'));
+        $this->client->expects($this->once())->method('send')->will($this->returnValue($expectedResponse));
+
+        $response = $this->client->getContactId('3', 'sender@example.com');
+
+        $expectedData = $expectedResponse->getData();
+        $this->assertEquals($expectedData['id'], $response);
+    }
+
+    /**
      * Get a json test data and decode it
      *
      * @param string $fileName
