@@ -105,7 +105,60 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedData['id'], $response);
     }
 
-    /**
+	/**
+	 * @covers \Snowcap\Emarsys\Response::__construct
+	 * @expectedException \Snowcap\Emarsys\Exception\ClientException
+	 * @expectedExceptionMessage Invalid result structure
+	 */
+	public function testItThrowsClientException()
+	{
+		$dummyResult = array('dummy');
+		new Response($dummyResult);
+	}
+
+	/**
+	 * @covers \Snowcap\Emarsys\Response::getData
+	 * @covers \Snowcap\Emarsys\Response::setData
+	 */
+	public function testItSetsAndGetsData()
+	{
+		$data = array('key' => 'val');
+		$response = new Response($this->createExpectedResponse('create'));
+		$response->setData($data);
+		$result = $response->getData();
+
+		$this->assertEquals($data, $result);
+	}
+
+	/**
+	 * @covers \Snowcap\Emarsys\Response::getReplyCode
+	 * @covers \Snowcap\Emarsys\Response::setReplyCode
+	 */
+	public function testItSetsAndGetsReplyCode()
+	{
+		$replyCode = 200;
+		$response = new Response($this->createExpectedResponse('create'));
+		$response->setReplyCode($replyCode);
+		$result = $response->getReplyCode();
+
+		$this->assertEquals($replyCode, $result);
+	}
+
+	/**
+	 * @covers \Snowcap\Emarsys\Response::getReplyText
+	 * @covers \Snowcap\Emarsys\Response::setReplyText
+	 */
+	public function testItSetsAndGetsReplyText()
+	{
+		$replyText = 'text-reply';
+		$response = new Response($this->createExpectedResponse('create'));
+		$response->setReplyText($replyText);
+		$result = $response->getReplyText();
+
+		$this->assertEquals($replyText, $result);
+	}
+
+	/**
      * Get a json test data and decode it
      *
      * @param string $fileName
@@ -118,4 +171,3 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         return json_decode($fileContent, true);
     }
 }
- 
