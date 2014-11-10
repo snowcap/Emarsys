@@ -114,7 +114,7 @@ You can find it in `src/Snowcap/Emarsys/ini/choices.ini`
 But you can add your own by calling :
 
 ```php
-$client->addChoicesMapping(array('gender' => array('male' => 1, 'female' => 2)));`
+$client->addChoicesMapping(array('gender' => array('male' => 1, 'female' => 2)));
 ```
 
 It means that you can use both IDs and custom names to reference field choices, so the two samples below do the same :
