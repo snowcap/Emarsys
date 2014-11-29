@@ -113,6 +113,15 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals($customChoice3Name, $resultField3Name);
 	}
 
+	/**
+	 * @expectedException \Snowcap\Emarsys\Exception\ClientException
+	 * @expectedExceptionMessage Unrecognized field name "non-existing-field-name"
+	 */
+	public function testItThrowsAnExceptionIfFieldDoesNotExist()
+	{
+		$this->client->getFieldId('non-existing-field-name');
+	}
+
     public function testGetEmails()
     {
         $expectedResponse = new Response($this->createExpectedResponse('emails'));

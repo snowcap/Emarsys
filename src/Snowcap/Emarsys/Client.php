@@ -137,14 +137,11 @@ class Client
      */
     public function getFieldId($field)
     {
-        if (is_numeric($field)) {
-            return (int)$field;
-        }
-        if (isset($this->fieldsMapping[$field])) {
-            return (int)$this->fieldsMapping[$field];
+        if (!isset($this->fieldsMapping[$field])) {
+	        throw new ClientException(sprintf('Unrecognized field name "%s"', $field));
         }
 
-        throw new ClientException(sprintf('Unrecognized field name "%s"', $field));
+	    return (int)$this->fieldsMapping[$field];
     }
 
     /**
@@ -177,18 +174,23 @@ class Client
         if (is_numeric($choice)) {
             return (int)$choice;
         }
-        if (!isset($this->choicesMapping[$this->getFieldName($field)])) {
+
+	    $fieldName = $this->getFieldName($field);
+
+        if (!array_key_exists($fieldName, $this->choicesMapping)) {
             throw new ClientException(sprintf('Unrecognized field "%s" for choice "%s"', $field, $choice));
         }
-        if (!isset($this->choicesMapping[$this->getFieldName($field)][$choice])) {
+
+        if (!isset($this->choicesMapping[$fieldName][$choice])) {
             throw new ClientException(sprintf('Unrecognized choice "%s" for field "%s"', $choice, $field));
         }
 
-        return (int)$this->choicesMapping[$this->getFieldName($field)][$choice];
+        return (int)$this->choicesMapping[$fieldName][$choice];
     }
 
     /**
-     * Returns a choice name for a field from a choice id (specified in the choices mapping) or the choice id if no mapping is found
+     * Returns a choice name for a field from a choice id (specified in the choices mapping) or the choice id if no
+     * mapping is found
      *
      * @param string|int $field
      * @param int $choiceId
@@ -197,10 +199,13 @@ class Client
      */
     public function getChoiceName($field, $choiceId)
     {
-        if(!isset($this->choicesMapping[$this->getFieldName($field)])) {
+	    $fieldName = $this->getFieldName($field);
+
+        if(!array_key_exists($fieldName, $this->choicesMapping)) {
             throw new ClientException(sprintf('Unrecognized field "%s" for choice id "%s"', $field, $choiceId));
         }
-        $field = array_search($choiceId, $this->choicesMapping[$this->getFieldName($field)]);
+
+        $field = array_search($choiceId, $this->choicesMapping[$fieldName]);
 
         if ($field) {
             return $field;
