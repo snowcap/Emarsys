@@ -42,6 +42,34 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 		$client->getConditions();
 	}
 
+	/**
+	 * @covers \Snowcap\Emarsys\Client::addFieldsMapping
+	 */
+	public function testItAddsFieldsMapping()
+	{
+		$customField1Id = 7147;
+		$customField1Name = 'myCustomField1';
+		$customField2Id = 7148;
+		$customField2Name = 'myCustomField2';
+
+		$mapping = array(
+			$customField1Name => $customField1Id,
+			$customField2Name => $customField2Id
+		);
+
+		$this->client->addFieldsMapping($mapping);
+
+		$resultField1Id = $this->client->getFieldId($customField1Name);
+		$resultField1Name = $this->client->getFieldName($customField1Id);
+		$resultField2Id = $this->client->getFieldId($customField2Name);
+		$resultField2Name = $this->client->getFieldName($customField2Id);
+
+		$this->assertEquals($customField1Id, $resultField1Id);
+		$this->assertEquals($customField1Name, $resultField1Name);
+		$this->assertEquals($customField2Id, $resultField2Id);
+		$this->assertEquals($customField2Name, $resultField2Name);
+	}
+
     /**
      * @covers \Snowcap\Emarsys\Client::getEmails
      */
