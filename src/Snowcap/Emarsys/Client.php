@@ -59,27 +59,25 @@ class Client
      * @param string $username The username requested by the Emarsys API
      * @param string $secret The secret requested by the Emarsys API
      * @param string $baseUrl Overrides the default baseUrl if needed
-     * @param array $fieldsMapping Overrides the default fields mapping if needed
-     * @param array $choicesMapping Overrides the default choices mapping if needed
+     * @param array $fieldsMap Overrides the default fields mapping if needed
+     * @param array $choicesMap Overrides the default choices mapping if needed
      */
-    public function __construct($username, $secret, $baseUrl = null, $fieldsMapping = array(), $choicesMapping = array())
+    public function __construct($username, $secret, $baseUrl = null, $fieldsMap = array(), $choicesMap = array())
     {
         $this->username = $username;
         $this->secret = $secret;
+	    $this->fieldsMapping = $fieldsMap;
+	    $this->choicesMapping = $choicesMap;
 
         if (null !== $baseUrl) {
             $this->baseUrl = $baseUrl;
         }
 
-        if (count($fieldsMapping) > 0) {
-            $this->fieldsMapping = $fieldsMapping;
-        } else {
+        if (empty($this->fieldsMapping)) {
             $this->fieldsMapping = $this->parseIniFile('fields.ini');
         }
 
-        if (count($choicesMapping) > 0) {
-            $this->choicesMapping = $choicesMapping;
-        } else {
+        if (empty($this->choicesMapping)) {
             $this->choicesMapping = $this->parseIniFile('choices.ini');
         }
 
