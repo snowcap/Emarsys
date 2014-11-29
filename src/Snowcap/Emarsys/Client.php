@@ -171,10 +171,6 @@ class Client
      */
     public function getChoiceId($field, $choice)
     {
-        if (is_numeric($choice)) {
-            return (int)$choice;
-        }
-
 	    $fieldName = $this->getFieldName($field);
 
         if (!array_key_exists($fieldName, $this->choicesMapping)) {

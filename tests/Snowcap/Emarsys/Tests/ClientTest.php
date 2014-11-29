@@ -122,6 +122,27 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 		$this->client->getFieldId('non-existing-field-name');
 	}
 
+	/**
+	 * @expectedException \Snowcap\Emarsys\Exception\ClientException
+	 * @expectedExceptionMessage Unrecognized field "non-existing-field-name" for choice "choice-name"
+	 */
+	public function testItThrowsAnExceptionIfChoiceFieldDoesNotExist()
+	{
+		$this->client->getChoiceId('non-existing-field-name', 'choice-name');
+	}
+
+	/**
+	 * @expectedException \Snowcap\Emarsys\Exception\ClientException
+	 * @expectedExceptionMessage Unrecognized choice "choice-name" for field "myCustomField"
+	 */
+	public function testItThrowsAnExceptionIfChoiceDoesNotExist()
+	{
+		$mapping = array('myCustomField' => array());
+		$this->client->addChoicesMapping($mapping);
+
+		$this->client->getChoiceId('myCustomField', 'choice-name');
+	}
+
     public function testGetEmails()
     {
         $expectedResponse = new Response($this->createExpectedResponse('emails'));
