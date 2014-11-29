@@ -137,10 +137,23 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testItThrowsAnExceptionIfChoiceDoesNotExist()
 	{
-		$mapping = array('myCustomField' => array());
-		$this->client->addChoicesMapping($mapping);
+		$fieldName = 'myCustomField';
+		$mapping = array($fieldName => array());
 
-		$this->client->getChoiceId('myCustomField', 'choice-name');
+		$this->client->addChoicesMapping($mapping);
+		$this->client->getChoiceId($fieldName, 'choice-name');
+	}
+
+	public function testItReturnsChoiceIdIfChoiceNameIsNotFound()
+	{
+		$fieldName = 'myCustomField';
+		$choiceId = 1;
+		$mapping = array($fieldName => array());
+
+		$this->client->addChoicesMapping($mapping);
+		$result = $this->client->getChoiceName($fieldName, $choiceId);
+
+		$this->assertEquals($choiceId, $result);
 	}
 
     public function testGetEmails()
