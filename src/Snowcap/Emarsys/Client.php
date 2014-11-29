@@ -117,7 +117,15 @@ class Client
      */
     public function addChoicesMapping($mapping = array())
     {
-        $this->choicesMapping = array_merge($this->choicesMapping, $mapping);
+	    foreach ($mapping as $field => $choices) {
+		    if (is_array($choices)) {
+			    if (!array_key_exists($field, $this->choicesMapping)) {
+				    $this->choicesMapping[$field] = array();
+			    }
+
+			    $this->choicesMapping[$field] = array_merge($this->choicesMapping[$field], $choices);
+		    }
+	    }
     }
 
     /**
@@ -189,10 +197,10 @@ class Client
      */
     public function getChoiceName($field, $choiceId)
     {
-        if(!isset($this->choicesMapping[$this->getFieldId($field)])) {
+        if(!isset($this->choicesMapping[$this->getFieldName($field)])) {
             throw new ClientException(sprintf('Unrecognized field "%s" for choice id "%s"', $field, $choiceId));
         }
-        $field = array_search($choiceId, $this->fieldsMapping[$this->getFieldId($field)]);
+        $field = array_search($choiceId, $this->choicesMapping[$this->getFieldName($field)]);
 
         if ($field) {
             return $field;

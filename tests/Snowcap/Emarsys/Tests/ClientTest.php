@@ -5,6 +5,10 @@ namespace Snowcap\Emarsys\Tests;
 use Snowcap\Emarsys\Client;
 use Snowcap\Emarsys\Response;
 
+/**
+ * @covers \Snowcap\Emarsys\Client
+ * @covers \Snowcap\Emarsys\Response
+ */
 class ClientTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -32,7 +36,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     }
 
 	/**
-	 * @covers \Snowcap\Emarsys\Client::__construct
 	 * @expectedException \Guzzle\Http\Exception\CurlException
 	 * @expectedExceptionMessage Couldn't resolve host 'dummy.url' [url] http://dummy.url/condition
 	 */
@@ -42,9 +45,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 		$client->getConditions();
 	}
 
-	/**
-	 * @covers \Snowcap\Emarsys\Client::addFieldsMapping
-	 */
 	public function testItAddsFieldsMapping()
 	{
 		$customField1Id = 7147;
@@ -70,9 +70,49 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals($customField2Name, $resultField2Name);
 	}
 
-    /**
-     * @covers \Snowcap\Emarsys\Client::getEmails
-     */
+	public function testItAddsChoicesMapping()
+	{
+		$customFieldName = 'myCustomField';
+		$customChoice1Id = 1;
+		$customChoice1Name = 'myCustomChoice1';
+		$customChoice2Id = 2;
+		$customChoice2Name = 'myCustomChoice2';
+		$customChoice3Id = 3;
+		$customChoice3Name = 'myCustomChoice3';
+
+		$mapping = array(
+			$customFieldName => array(
+				$customChoice1Name => $customChoice1Id
+			)
+		);
+
+		/* Adding one choice first to test later that it is not overwritten by adding more choices */
+		$this->client->addChoicesMapping($mapping);
+
+		$mapping = array(
+			$customFieldName => array(
+				$customChoice2Name => $customChoice2Id,
+				$customChoice3Name => $customChoice3Id
+			)
+		);
+
+		$this->client->addChoicesMapping($mapping);
+
+		$resultField1Id = $this->client->getChoiceId($customFieldName, $customChoice1Name);
+		$resultField1Name = $this->client->getChoiceName($customFieldName, $customChoice1Id);
+		$resultField2Id = $this->client->getChoiceId($customFieldName, $customChoice2Name);
+		$resultField2Name = $this->client->getChoiceName($customFieldName, $customChoice2Id);
+		$resultField3Id = $this->client->getChoiceId($customFieldName, $customChoice3Name);
+		$resultField3Name = $this->client->getChoiceName($customFieldName, $customChoice3Id);
+
+		$this->assertEquals($customChoice1Id, $resultField1Id);
+		$this->assertEquals($customChoice1Name, $resultField1Name);
+		$this->assertEquals($customChoice2Id, $resultField2Id);
+		$this->assertEquals($customChoice2Name, $resultField2Name);
+		$this->assertEquals($customChoice3Id, $resultField3Id);
+		$this->assertEquals($customChoice3Name, $resultField3Name);
+	}
+
     public function testGetEmails()
     {
         $expectedResponse = new Response($this->createExpectedResponse('emails'));
@@ -103,9 +143,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @covers \Snowcap\Emarsys\Client::createEmail
-     */
     public function testCreateEmail()
     {
         $expectedResponse = new Response($this->createExpectedResponse('create'));
@@ -132,9 +169,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('id', $response->getData());
     }
 
-    /**
-     * @covers \Snowcap\Emarsys\Client::getContactId
-     */
     public function testGetContactIdSuccess()
     {
         $expectedResponse = new Response($this->createExpectedResponse('getContactId'));
@@ -147,7 +181,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     }
 
 	/**
-	 * @covers \Snowcap\Emarsys\Response::__construct
 	 * @expectedException \Snowcap\Emarsys\Exception\ClientException
 	 * @expectedExceptionMessage Invalid result structure
 	 */
@@ -157,10 +190,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 		new Response($dummyResult);
 	}
 
-	/**
-	 * @covers \Snowcap\Emarsys\Response::getData
-	 * @covers \Snowcap\Emarsys\Response::setData
-	 */
 	public function testItSetsAndGetsData()
 	{
 		$data = array('key' => 'val');
@@ -171,10 +200,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals($data, $result);
 	}
 
-	/**
-	 * @covers \Snowcap\Emarsys\Response::getReplyCode
-	 * @covers \Snowcap\Emarsys\Response::setReplyCode
-	 */
 	public function testItSetsAndGetsReplyCode()
 	{
 		$replyCode = 200;
@@ -185,10 +210,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals($replyCode, $result);
 	}
 
-	/**
-	 * @covers \Snowcap\Emarsys\Response::getReplyText
-	 * @covers \Snowcap\Emarsys\Response::setReplyText
-	 */
 	public function testItSetsAndGetsReplyText()
 	{
 		$replyText = 'text-reply';
@@ -205,7 +226,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
      * @param string $fileName
      * @return mixed
      */
-    protected function createExpectedResponse($fileName)
+    private function createExpectedResponse($fileName)
     {
         $fileContent = file_get_contents(__DIR__ . '/TestData/' . $fileName . '.json');
 
