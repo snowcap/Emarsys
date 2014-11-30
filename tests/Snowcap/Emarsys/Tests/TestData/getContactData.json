@@ -1,0 +1,17 @@
+{
+    "replyCode":0,
+    "replyText":"OK",
+    "data":
+    {
+        "result": [
+            {
+                "emailId":"123456",
+                "contactId":"15",
+                "launch_date":"2012-05-05",
+                "delivery_status":"launched",
+                "bounce_status":"soft",
+                "7939":"1"
+            }
+        ]
+    }
+}

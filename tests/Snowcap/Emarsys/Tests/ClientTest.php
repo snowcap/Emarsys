@@ -263,6 +263,17 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals($replyText, $result);
 	}
 
+	public function testItReturnsContactData()
+	{
+		$expectedResponse = new Response($this->createExpectedResponse('getContactData'));
+		$this->client->expects($this->once())->method('send')->will($this->returnValue($expectedResponse));
+
+		$response = $this->client->getContactData(array());
+
+		$this->assertEquals($expectedResponse, $response);
+
+	}
+
 	/**
      * Get a json test data and decode it
      *
