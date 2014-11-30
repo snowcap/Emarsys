@@ -225,7 +225,7 @@ class Client
      * Example :
      *  $data = array(
      *      'key_id' => '3',
-     *      '3' => recipient@example.com',
+     *      '3' => 'recipient@example.com',
      *      'source_id' => '123',
      *  );
      * @param array $data

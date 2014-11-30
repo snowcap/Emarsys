@@ -188,7 +188,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateEmail()
     {
-        $expectedResponse = new Response($this->createExpectedResponse('create'));
+        $expectedResponse = new Response($this->createExpectedResponse('createContact'));
         $this->client->expects($this->any())->method('send')->will($this->returnValue($expectedResponse));
 
         $data = array(
@@ -236,7 +236,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 	public function testItSetsAndGetsData()
 	{
 		$data = array('key' => 'val');
-		$response = new Response($this->createExpectedResponse('create'));
+		$response = new Response($this->createExpectedResponse('createContact'));
 		$response->setData($data);
 		$result = $response->getData();
 
@@ -246,7 +246,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 	public function testItSetsAndGetsReplyCode()
 	{
 		$replyCode = 200;
-		$response = new Response($this->createExpectedResponse('create'));
+		$response = new Response($this->createExpectedResponse('createContact'));
 		$response->setReplyCode($replyCode);
 		$result = $response->getReplyCode();
 
@@ -256,7 +256,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 	public function testItSetsAndGetsReplyText()
 	{
 		$replyText = 'text-reply';
-		$response = new Response($this->createExpectedResponse('create'));
+		$response = new Response($this->createExpectedResponse('createContact'));
 		$response->setReplyText($replyText);
 		$result = $response->getReplyText();
 
@@ -266,12 +266,30 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 	public function testItReturnsContactData()
 	{
 		$expectedResponse = new Response($this->createExpectedResponse('getContactData'));
-		$this->client->expects($this->once())->method('send')->will($this->returnValue($expectedResponse));
+		$this->client->expects($this->once())
+			->method('send')
+			->willReturn($expectedResponse);
 
 		$response = $this->client->getContactData(array());
 
 		$this->assertEquals($expectedResponse, $response);
 
+	}
+
+	public function testItCreatesContact()
+	{
+		$expectedResponse = new Response($this->createExpectedResponse('createContact'));
+		$this->client->expects($this->once())
+			->method('send')
+			->willReturn($expectedResponse);
+
+		$data = array(
+			'3'         => 'recipient@example.com',
+			'source'    => '123',
+		);
+		$response = $this->client->createContact($data);
+
+		$this->assertEquals($expectedResponse, $response);
 	}
 
 	/**
