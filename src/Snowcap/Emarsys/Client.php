@@ -59,27 +59,25 @@ class Client
      * @param string $username The username requested by the Emarsys API
      * @param string $secret The secret requested by the Emarsys API
      * @param string $baseUrl Overrides the default baseUrl if needed
-     * @param array $fieldsMapping Overrides the default fields mapping if needed
-     * @param array $choicesMapping Overrides the default choices mapping if needed
+     * @param array $fieldsMap Overrides the default fields mapping if needed
+     * @param array $choicesMap Overrides the default choices mapping if needed
      */
-    public function __construct($username, $secret, $baseUrl = null, $fieldsMapping = array(), $choicesMapping = array())
+    public function __construct($username, $secret, $baseUrl = null, $fieldsMap = array(), $choicesMap = array())
     {
         $this->username = $username;
         $this->secret = $secret;
+	    $this->fieldsMapping = $fieldsMap;
+	    $this->choicesMapping = $choicesMap;
 
         if (null !== $baseUrl) {
             $this->baseUrl = $baseUrl;
         }
 
-        if (count($fieldsMapping) > 0) {
-            $this->fieldsMapping = $fieldsMapping;
-        } else {
+        if (empty($this->fieldsMapping)) {
             $this->fieldsMapping = $this->parseIniFile('fields.ini');
         }
 
-        if (count($choicesMapping) > 0) {
-            $this->choicesMapping = $choicesMapping;
-        } else {
+        if (empty($this->choicesMapping)) {
             $this->choicesMapping = $this->parseIniFile('choices.ini');
         }
 
@@ -119,7 +117,15 @@ class Client
      */
     public function addChoicesMapping($mapping = array())
     {
-        $this->choicesMapping = array_merge($this->choicesMapping, $mapping);
+	    foreach ($mapping as $field => $choices) {
+		    if (is_array($choices)) {
+			    if (!array_key_exists($field, $this->choicesMapping)) {
+				    $this->choicesMapping[$field] = array();
+			    }
+
+			    $this->choicesMapping[$field] = array_merge($this->choicesMapping[$field], $choices);
+		    }
+	    }
     }
 
     /**
@@ -131,14 +137,11 @@ class Client
      */
     public function getFieldId($field)
     {
-        if (is_numeric($field)) {
-            return (int)$field;
-        }
-        if (isset($this->fieldsMapping[$field])) {
-            return (int)$this->fieldsMapping[$field];
+        if (!isset($this->fieldsMapping[$field])) {
+	        throw new ClientException(sprintf('Unrecognized field name "%s"', $field));
         }
 
-        throw new ClientException(sprintf('Unrecognized field name "%s"', $field));
+	    return (int)$this->fieldsMapping[$field];
     }
 
     /**
@@ -168,21 +171,22 @@ class Client
      */
     public function getChoiceId($field, $choice)
     {
-        if (is_numeric($choice)) {
-            return (int)$choice;
-        }
-        if (!isset($this->choicesMapping[$this->getFieldName($field)])) {
+	    $fieldName = $this->getFieldName($field);
+
+        if (!array_key_exists($fieldName, $this->choicesMapping)) {
             throw new ClientException(sprintf('Unrecognized field "%s" for choice "%s"', $field, $choice));
         }
-        if (!isset($this->choicesMapping[$this->getFieldName($field)][$choice])) {
+
+        if (!isset($this->choicesMapping[$fieldName][$choice])) {
             throw new ClientException(sprintf('Unrecognized choice "%s" for field "%s"', $choice, $field));
         }
 
-        return (int)$this->choicesMapping[$this->getFieldName($field)][$choice];
+        return (int)$this->choicesMapping[$fieldName][$choice];
     }
 
     /**
-     * Returns a choice name for a field from a choice id (specified in the choices mapping) or the choice id if no mapping is found
+     * Returns a choice name for a field from a choice id (specified in the choices mapping) or the choice id if no
+     * mapping is found
      *
      * @param string|int $field
      * @param int $choiceId
@@ -191,10 +195,13 @@ class Client
      */
     public function getChoiceName($field, $choiceId)
     {
-        if(!isset($this->choicesMapping[$this->getFieldId($field)])) {
+	    $fieldName = $this->getFieldName($field);
+
+        if(!array_key_exists($fieldName, $this->choicesMapping)) {
             throw new ClientException(sprintf('Unrecognized field "%s" for choice id "%s"', $field, $choiceId));
         }
-        $field = array_search($choiceId, $this->fieldsMapping[$this->getFieldId($field)]);
+
+        $field = array_search($choiceId, $this->choicesMapping[$fieldName]);
 
         if ($field) {
             return $field;
@@ -218,7 +225,7 @@ class Client
      * Example :
      *  $data = array(
      *      'key_id' => '3',
-     *      '3' => recipient@example.com',
+     *      '3' => 'recipient@example.com',
      *      'source_id' => '123',
      *  );
      * @param array $data
