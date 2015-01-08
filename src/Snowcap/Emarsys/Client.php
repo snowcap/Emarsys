@@ -124,7 +124,7 @@ class Client
     /**
      * Returns a field id from a field name (specified in the fields mapping)
      *
-     * @param string|int $field
+     * @param string $field
      * @return int
      * @throws Exception\ClientException
      */
