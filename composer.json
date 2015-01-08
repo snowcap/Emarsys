@@ -10,8 +10,7 @@
     },
     "autoload": {
         "psr-0": {
-            "Snowcap\\Emarsys": "src/",
-            "Snowcap\\Emarsys\\Tests": "tests/"
+            "Snowcap\\Emarsys": "src/"
         }
     },
     "license": "MIT",
