@@ -42,7 +42,7 @@ class CurlClient implements HttpClient
 	/**
 	 * @param string $method
 	 * @param string $uri
-	 * @param array $body
+	 * @param mixed $body
 	 * @return string
 	 */
 	private function updateUri($method, $uri, $body)
