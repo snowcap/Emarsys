@@ -9,8 +9,8 @@ class CurlClient implements HttpClient
 	/**
 	 * @param string $method
 	 * @param string $uri
-	 * @param array $headers
-	 * @param mixed $body
+	 * @param string[] $headers
+	 * @param string|array|null $body
 	 * @return string
 	 * @throws ClientException
 	 */

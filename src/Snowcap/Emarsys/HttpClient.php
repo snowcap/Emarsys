@@ -12,9 +12,9 @@ interface HttpClient
 	/**
 	 * @param string $method
 	 * @param string $uri
-	 * @param array $headers
-	 * @param mixed $body
-	 * @return mixed
+	 * @param string[] $headers
+	 * @param string|array|null $body
+	 * @return string
 	 */
 	public function send($method, $uri, $headers, $body);
 }
