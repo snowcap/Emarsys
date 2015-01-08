@@ -1,9 +1,6 @@
 <?php
 
-namespace Snowcap\Emarsys\Tests;
-
-use Snowcap\Emarsys\Client;
-use Snowcap\Emarsys\Response;
+namespace Snowcap\Emarsys;
 
 /**
  * @covers \Snowcap\Emarsys\Client
@@ -16,34 +13,20 @@ class ClientTest extends \PHPUnit_Framework_TestCase
      */
     private $client;
 
-    public function setUp()
+	/**
+	 * @var |PHpUnit_Framework_MockObject_MockObject|HttpClient
+	 */
+	private $httpClient;
+
+    protected function setUp()
     {
+	    $this->httpClient = $this->getMock(HttpClient::class);
+
 	    $this->client = $this->getMockBuilder(Client::class)
 		    ->setMethods(array('send'))
-		    ->setConstructorArgs(array('dummy-api-username', 'dummy-api-secret'))
+		    ->setConstructorArgs(array($this->httpClient, 'dummy-api-username', 'dummy-api-secret'))
 	        ->getMock();
     }
-
-    /**
-     * @expectedException \Snowcap\Emarsys\Exception\ServerException
-     * @expectedExceptionMessage Unauthorized
-     * @expectedExceptionCode \Snowcap\Emarsys\Response::REPLY_CODE_INTERNAL_ERROR
-     */
-    public function testUnauthorizedException()
-    {
-        $client = new Client('wrong_username', 'wrong_secret');
-        $client->getConditions();
-    }
-
-	/**
-	 * @expectedException \Guzzle\Http\Exception\CurlException
-	 * @expectedExceptionMessage Couldn't resolve host 'dummy.url' [url] http://dummy.url/condition
-	 */
-	public function testItUsesBaseUrlOverride()
-	{
-		$client = new Client('dummy_username', 'dummy_password', 'http://dummy.url/');
-		$client->getConditions();
-	}
 
 	public function testItAddsFieldsMapping()
 	{

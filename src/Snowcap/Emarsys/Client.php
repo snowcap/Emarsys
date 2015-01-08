@@ -2,10 +2,6 @@
 
 namespace Snowcap\Emarsys;
 
-use Guzzle\Http\Client as GuzzleClient;
-use Guzzle\Http\Exception\ClientErrorResponseException;
-use Guzzle\Http\Message\RequestInterface;
-
 use Snowcap\Emarsys\Exception\ClientException;
 use Snowcap\Emarsys\Exception\ServerException;
 
@@ -25,45 +21,44 @@ class Client
     /**
      * @var string
      */
-    protected $baseUrl = 'https://suite6.emarsys.net/api/v2/';
+    private $baseUrl = 'https://suite6.emarsys.net/api/v2/';
     /**
      * @var string
      */
-    protected $username;
+    private $username;
     /**
      * @var string
      */
-    protected $secret;
+    private $secret;
 
     /**
-     * @var Client
+     * @var HttpClient
      */
-    protected $client;
+    private $client;
 
     /**
      * @var array
      */
-    protected $headers = array();
+    private $fieldsMapping = array();
 
     /**
      * @var array
      */
-    protected $fieldsMapping = array();
+    private $choicesMapping = array();
 
     /**
-     * @var array
-     */
-    protected $choicesMapping = array();
-
-    /**
+     * @param HttpClient $client HTTP client implementation
      * @param string $username The username requested by the Emarsys API
      * @param string $secret The secret requested by the Emarsys API
      * @param string $baseUrl Overrides the default baseUrl if needed
      * @param array $fieldsMap Overrides the default fields mapping if needed
      * @param array $choicesMap Overrides the default choices mapping if needed
      */
-    public function __construct($username, $secret, $baseUrl = null, $fieldsMap = array(), $choicesMap = array())
+    public function __construct(
+        HttpClient $client, $username, $secret, $baseUrl = null, $fieldsMap = array(), $choicesMap = array()
+    )
     {
+	    $this->client = $client;
         $this->username = $username;
         $this->secret = $secret;
 	    $this->fieldsMapping = $fieldsMap;
@@ -80,8 +75,6 @@ class Client
         if (empty($this->choicesMapping)) {
             $this->choicesMapping = $this->parseIniFile('choices.ini');
         }
-
-        $this->client = new GuzzleClient($this->baseUrl);
     }
 
     /**
@@ -217,7 +210,7 @@ class Client
      */
     public function getConditions()
     {
-        return $this->send(RequestInterface::GET, 'condition');
+        return $this->send(HttpClient::GET, 'condition');
     }
 
     /**
@@ -233,7 +226,7 @@ class Client
      */
     public function createContact($data)
     {
-        return $this->send(RequestInterface::POST, 'contact', array(), $this->mapFieldsToIds($data));
+        return $this->send(HttpClient::POST, 'contact', $this->mapFieldsToIds($data));
     }
 
     /**
@@ -244,7 +237,7 @@ class Client
      */
     public function updateContact($data)
     {
-        return $this->send(RequestInterface::PUT, 'contact', array(), $this->mapFieldsToIds($data));
+        return $this->send(HttpClient::PUT, 'contact', $this->mapFieldsToIds($data));
     }
 
     /**
@@ -257,7 +250,7 @@ class Client
      */
     public function getContactId($fieldId, $fieldValue)
     {
-        $response = $this->send(RequestInterface::GET, sprintf('contact/%s=%s', $fieldId, $fieldValue));
+        $response = $this->send(HttpClient::GET, sprintf('contact/%s=%s', $fieldId, $fieldValue));
 
         $data = $response->getData();
 
@@ -276,7 +269,7 @@ class Client
      */
     public function getContactChanges($data)
     {
-        return $this->send(RequestInterface::POST, 'contact/getchanges', array(), $data);
+        return $this->send(HttpClient::POST, 'contact/getchanges', $data);
     }
 
     /**
@@ -287,7 +280,7 @@ class Client
      */
     public function getContactHistory($data)
     {
-        return $this->send(RequestInterface::POST, 'contact/getcontacthistory', array(), $data);
+        return $this->send(HttpClient::POST, 'contact/getcontacthistory', $data);
     }
 
     /**
@@ -307,7 +300,7 @@ class Client
      */
     public function getContactData($data, $responseWithFieldNames = true)
     {
-        $response = $this->send(RequestInterface::POST, 'contact/getdata', array(), $data);
+        $response = $this->send(HttpClient::POST, 'contact/getdata', $data);
 
         if ($responseWithFieldNames) {
             $data = $response->getData();
@@ -328,7 +321,7 @@ class Client
      */
     public function getContactRegistrations($data)
     {
-        return $this->send(RequestInterface::POST, 'contact/getregistrations', array(), $data);
+        return $this->send(HttpClient::POST, 'contact/getregistrations', $data);
     }
 
     /**
@@ -339,7 +332,7 @@ class Client
      */
     public function getContactList($data)
     {
-        return $this->send(RequestInterface::GET, 'contactlist', array(), $data);
+        return $this->send(HttpClient::GET, 'contactlist', $data);
     }
 
     /**
@@ -350,7 +343,7 @@ class Client
      */
     public function createContactList($data)
     {
-        return $this->send(RequestInterface::POST, 'contactlist', array(), $data);
+        return $this->send(HttpClient::POST, 'contactlist', $data);
     }
 
     /**
@@ -362,7 +355,7 @@ class Client
      */
     public function addContactsToContactList($listId, $data)
     {
-        return $this->send(RequestInterface::POST, sprintf('contactlist/%s/add', $listId), array(), $data);
+        return $this->send(HttpClient::POST, sprintf('contactlist/%s/add', $listId), $data);
     }
 
     /**
@@ -374,7 +367,7 @@ class Client
      */
     public function removeContactsFromContactList($listId, $data)
     {
-        return $this->send(RequestInterface::POST, sprintf('contactlist/%s/delete', $listId), array(), $data);
+        return $this->send(HttpClient::POST, sprintf('contactlist/%s/delete', $listId), $data);
     }
 
     /**
@@ -398,7 +391,7 @@ class Client
             $url = sprintf('%s/%s', $url, http_build_query($data));
         }
 
-        return $this->send(RequestInterface::GET, $url);
+        return $this->send(HttpClient::GET, $url);
     }
 
     /**
@@ -424,7 +417,7 @@ class Client
      */
     public function createEmail($data)
     {
-        return $this->send(RequestInterface::POST, 'email', array(), (object)$data);
+        return $this->send(HttpClient::POST, 'email', (object)$data);
     }
 
     /**
@@ -436,7 +429,7 @@ class Client
      */
     public function getEmail($emailId, $data)
     {
-        return $this->send(RequestInterface::GET, sprintf('email/%s', $emailId), array(), $data);
+        return $this->send(HttpClient::GET, sprintf('email/%s', $emailId), $data);
     }
 
     /**
@@ -448,7 +441,7 @@ class Client
      */
     public function launchEmail($emailId, $data)
     {
-        return $this->send(RequestInterface::POST, sprintf('email/%s/launch', $emailId), array(), $data);
+        return $this->send(HttpClient::POST, sprintf('email/%s/launch', $emailId), $data);
     }
 
     /**
@@ -460,7 +453,7 @@ class Client
      */
     public function previewEmail($emailId, $data)
     {
-        return $this->send(RequestInterface::POST, sprintf('email/%s/launch', $emailId), array(), $data);
+        return $this->send(HttpClient::POST, sprintf('email/%s/launch', $emailId), $data);
     }
 
     /**
@@ -472,7 +465,7 @@ class Client
      */
     public function getEmailResponseSummary($emailId, $data)
     {
-        return $this->send(RequestInterface::POST, sprintf('email/%s/responsesummary', $emailId), array(), $data);
+        return $this->send(HttpClient::POST, sprintf('email/%s/responsesummary', $emailId), $data);
     }
 
     /**
@@ -484,7 +477,7 @@ class Client
      */
     public function sendEmailTest($emailId, $data)
     {
-        return $this->send(RequestInterface::POST, sprintf('email/%s/sendtestmail', $emailId), array(), $data);
+        return $this->send(HttpClient::POST, sprintf('email/%s/sendtestmail', $emailId), $data);
     }
 
     /**
@@ -496,7 +489,7 @@ class Client
      */
     public function getEmailUrl($emailId, $data)
     {
-        return $this->send(RequestInterface::POST, sprintf('email/%s/url', $emailId), array(), $data);
+        return $this->send(HttpClient::POST, sprintf('email/%s/url', $emailId), $data);
     }
 
     /**
@@ -507,7 +500,7 @@ class Client
      */
     public function getEmailDeliveryStatus($data)
     {
-        return $this->send(RequestInterface::POST, 'email/getdeliverystatus', array(), $data);
+        return $this->send(HttpClient::POST, 'email/getdeliverystatus', $data);
     }
 
     /**
@@ -518,7 +511,7 @@ class Client
      */
     public function getEmailLaunches($data)
     {
-        return $this->send(RequestInterface::GET, 'email/getlaunchesofemail', array(), $data);
+        return $this->send(HttpClient::GET, 'email/getlaunchesofemail', $data);
     }
 
     /**
@@ -529,7 +522,7 @@ class Client
      */
     public function getEmailResponses($data)
     {
-        return $this->send(RequestInterface::POST, 'email/getresponses', array(), $data);
+        return $this->send(HttpClient::POST, 'email/getresponses', $data);
     }
 
     /**
@@ -540,7 +533,7 @@ class Client
      */
     public function getEmailCategories($data)
     {
-        return $this->send(RequestInterface::GET, 'emailcategory', array(), $data);
+        return $this->send(HttpClient::GET, 'emailcategory', $data);
     }
 
     /**
@@ -551,7 +544,7 @@ class Client
      */
     public function getEvents($data)
     {
-        return $this->send(RequestInterface::GET, 'event', array(), $data);
+        return $this->send(HttpClient::GET, 'event', $data);
     }
 
     /**
@@ -563,7 +556,7 @@ class Client
      */
     public function triggerEvent($eventId, $data)
     {
-        return $this->send(RequestInterface::POST, sprintf('event/%s/trigger', $eventId), array(), $data);
+        return $this->send(HttpClient::POST, sprintf('event/%s/trigger', $eventId), $data);
     }
 
     /**
@@ -574,7 +567,7 @@ class Client
      */
     public function getExportStatus($data)
     {
-        return $this->send(RequestInterface::GET, 'export', array(), $data);
+        return $this->send(HttpClient::GET, 'export', $data);
     }
 
     /**
@@ -584,7 +577,7 @@ class Client
      */
     public function getFields()
     {
-        return $this->send(RequestInterface::GET, 'field');
+        return $this->send(HttpClient::GET, 'field');
     }
 
     /**
@@ -595,7 +588,7 @@ class Client
      */
     public function getFieldChoices($fieldId)
     {
-        return $this->send(RequestInterface::GET, sprintf('field/%s/choice', $this->getFieldId($fieldId)));
+        return $this->send(HttpClient::GET, sprintf('field/%s/choice', $this->getFieldId($fieldId)));
     }
 
     /**
@@ -606,7 +599,7 @@ class Client
      */
     public function getFiles($data)
     {
-        return $this->send(RequestInterface::GET, 'file', array(), $data);
+        return $this->send(HttpClient::GET, 'file', $data);
     }
 
     /**
@@ -617,7 +610,7 @@ class Client
      */
     public function uploadFile($data)
     {
-        return $this->send(RequestInterface::POST, 'file', array(), $data);
+        return $this->send(HttpClient::POST, 'file', $data);
     }
 
     /**
@@ -628,7 +621,7 @@ class Client
      */
     public function getSegments($data)
     {
-        return $this->send(RequestInterface::GET, 'filter', array(), $data);
+        return $this->send(HttpClient::GET, 'filter', $data);
     }
 
     /**
@@ -639,7 +632,7 @@ class Client
      */
     public function getFolders($data)
     {
-        return $this->send(RequestInterface::GET, 'folder', array(), $data);
+        return $this->send(HttpClient::GET, 'folder', $data);
     }
 
     /**
@@ -650,7 +643,7 @@ class Client
      */
     public function getForms($data)
     {
-        return $this->send(RequestInterface::GET, 'form', array(), $data);
+        return $this->send(HttpClient::GET, 'form', $data);
     }
 
     /**
@@ -660,7 +653,7 @@ class Client
      */
     public function getLanguages()
     {
-        return $this->send(RequestInterface::GET, 'language');
+        return $this->send(HttpClient::GET, 'language');
     }
 
     /**
@@ -670,7 +663,7 @@ class Client
      */
     public function getSources()
     {
-        return $this->send(RequestInterface::GET, 'source');
+        return $this->send(HttpClient::GET, 'source');
     }
 
     /**
@@ -681,7 +674,7 @@ class Client
      */
     public function deleteSource($sourceId)
     {
-        return $this->send(RequestInterface::DELETE, sprintf('source/%s/delete', $sourceId));
+        return $this->send(HttpClient::DELETE, sprintf('source/%s/delete', $sourceId));
     }
 
     /**
@@ -692,56 +685,35 @@ class Client
      */
     public function createSource($data)
     {
-        return $this->send(RequestInterface::POST, 'source/create', array(), $data);
-    }
-
-    /**
-     * @param string $method
-     * @param string|null $uri
-     * @param array $headers
-     * @param string|resource|array $body
-     * @param array $options
-     * @return Response
-     * @throws ServerException
-     */
-    public function send($method = 'GET', $uri = null, $headers = array(), $body = null, $options = array())
-    {
-        $request = $this->createRequest($method, $uri, $headers, $body ? json_encode($body) : null, $options);
-
-        try {
-            $response = $request->send();
-
-            return $this->getResponse($response->json());
-        } catch (ClientErrorResponseException $e) {
-            $response = $e->getResponse();
-            $result = $this->getResponse($response->json());
-
-            throw new ServerException($result->getReplyText(), $result->getReplyCode());
-        }
-
+        return $this->send(HttpClient::POST, 'source/create', $data);
     }
 
     /**
      * @param string $method
      * @param string $uri
-     * @param array $headers
-     * @param string $body
-     * @param array $options
-     * @return \Guzzle\Http\Message\RequestInterface
+     * @param string|resource|array $body
+     * @return Response
+     * @throws ServerException
      */
-    public function createRequest($method = 'GET', $uri = null, $headers = array(), $body = null, $options = array())
+    public function send($method = 'GET', $uri, $body = null)
     {
-        $headers = array_merge(
-            array(
-                'Content-Type' => 'application/json',
-                'X-WSSE' => $this->getAuthenticationSignature(),
-            ),
-            $headers
-        );
+	    $headers = ['Content-Type: application/json', 'X-WSSE: ' . $this->getAuthenticationSignature()];
+	    $uri = $this->baseUrl . $uri;
 
-        $request = $this->client->createRequest($method, $uri, $headers, $body, $options);
+	    if (!is_null($body)) {
+		    $body = json_encode($body);
+	    }
 
-        return $request;
+	    try {
+		    $responseJson = $this->client->send($method, $uri, $headers, $body);
+	    } catch (\Exception $e) {
+		    throw new ServerException($e->getMessage());
+	    }
+
+	    $responseArray = json_decode($responseJson, true);
+	    $response = $this->getResponse($responseArray);
+
+	    return $response;
     }
 
     /**
@@ -758,7 +730,7 @@ class Client
      *
      * @return string
      */
-    protected function getAuthenticationSignature()
+    private function getAuthenticationSignature()
     {
         // the current time encoded as an ISO 8601 date string
         $created = new \DateTime();
@@ -788,7 +760,7 @@ class Client
      * @param array $data
      * @return array
      */
-    protected function mapFieldsToIds(array $data)
+    private function mapFieldsToIds(array $data)
     {
         $mappedData = array();
 
@@ -809,7 +781,7 @@ class Client
      * @param array $data
      * @return array
      */
-    protected function mapIdsToFields(array $data)
+    private function mapIdsToFields(array $data)
     {
         $mappedData = array();
 
@@ -828,7 +800,7 @@ class Client
      * @param string $filename
      * @return array
      */
-    protected function parseIniFile($filename)
+    private function parseIniFile($filename)
     {
         $data = parse_ini_file(__DIR__ . '/ini/' . $filename, true);
 
@@ -839,7 +811,7 @@ class Client
      * @param mixed $data
      * @return mixed
      */
-    protected function castIniFileValues($data)
+    private function castIniFileValues($data)
     {
         foreach ($data as $key => $value) {
             if (is_array($value)) {

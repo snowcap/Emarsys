@@ -8,6 +8,7 @@ require_once 'config.php';
 
 use Snowcap\Emarsys\Client;
 use Snowcap\Emarsys\Response;
+use Snowcap\Emarsys\CurlClient;
 
 /**
  * @param Response $response
@@ -66,15 +67,16 @@ function sendContact(Client $client)
     return $response;
 }
 
+$httpClient = new CurlClient();
 
-$client = new Client(EMARSYS_API_USERNAME, EMARSYS_API_SECRET);
+$client = new Client($httpClient, EMARSYS_API_USERNAME, EMARSYS_API_SECRET);
 
 
 try {
     // Get available languages
     //testAPI($client->getLanguages());
 
-    // Get availables fields
+    // Get available fields
     //testAPI($client->getFields());
 
     // Create basic contact
