@@ -216,34 +216,27 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 		new Response($dummyResult);
 	}
 
-	public function testItSetsAndGetsData()
+	public function testItGetsResponseData()
 	{
-		$data = array('key' => 'val');
-		$response = new Response($this->createExpectedResponse('createContact'));
-		$response->setData($data);
-		$result = $response->getData();
+		$result = (new Response($this->createExpectedResponse('createContact')))->getData();
 
-		$this->assertEquals($data, $result);
+		$this->assertInternalType('array', $result);
+		$this->assertNotEmpty($result);
+
 	}
 
 	public function testItSetsAndGetsReplyCode()
 	{
-		$replyCode = 200;
-		$response = new Response($this->createExpectedResponse('createContact'));
-		$response->setReplyCode($replyCode);
-		$result = $response->getReplyCode();
+		$result = (new Response($this->createExpectedResponse('createContact')))->getReplyCode();
 
-		$this->assertEquals($replyCode, $result);
+		$this->assertSame(Response::REPLY_CODE_OK, $result);
 	}
 
 	public function testItSetsAndGetsReplyText()
 	{
-		$replyText = 'text-reply';
-		$response = new Response($this->createExpectedResponse('createContact'));
-		$response->setReplyText($replyText);
-		$result = $response->getReplyText();
+		$result = (new Response($this->createExpectedResponse('createContact')))->getReplyText();
 
-		$this->assertEquals($replyText, $result);
+		$this->assertEquals('OK', $result);
 	}
 
 	public function testItReturnsContactData()
