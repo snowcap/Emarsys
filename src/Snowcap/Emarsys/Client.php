@@ -289,28 +289,18 @@ class Client
      * Example:
      *
      *  $data = array(
-     *      'keyId' => 3, // contact element used as a key to select the contacts.To use the internalID, pass"id" to the "keyId" parameter.
-     *      'keyValues' => array('example@example.com', 'example2@example.com') // an array containing contactIDs or values of the column used to select contacts
+     *      'keyId' => 3, // Contact element used as a key to select the contacts.
+     *                    // To use the internalID, pass "id" to the "keyId" parameter.
+     *      'keyValues' => array('example@example.com', 'example2@example.com') // An array of contactIDs or values of
+     *                                                                          // the column used to select contacts.
      *  );
      *
-     *
      * @param array $data
-     * @param bool $responseWithFieldNames Select true if you want to map field ids to field names
      * @return Response
      */
-    public function getContactData($data, $responseWithFieldNames = true)
+    public function getContactData($data)
     {
-        $response = $this->send(HttpClient::POST, 'contact/getdata', $data);
-
-        if ($responseWithFieldNames) {
-            $data = $response->getData();
-            foreach ($data['result'] as $key => $contact) {
-                $data['result'][$key] = $this->mapIdsToFields($contact);
-            }
-            $response->setData($data);
-        }
-
-        return $response;
+        return $this->send(HttpClient::POST, 'contact/getdata', $data);
     }
 
     /**
@@ -769,27 +759,6 @@ class Client
                 $mappedData[(int)$name] = $value;
             } else {
                 $mappedData[$this->getFieldId($name)] = $value;
-            }
-        }
-
-        return $mappedData;
-    }
-
-    /**
-     * Convert field ids to field names
-     *
-     * @param array $data
-     * @return array
-     */
-    private function mapIdsToFields(array $data)
-    {
-        $mappedData = array();
-
-        foreach ($data as $id => $value) {
-            if (is_numeric($id)) {
-                $mappedData[$this->getFieldName($id)] = $value;
-            } else {
-                $mappedData[$id] = $value;
             }
         }
 
