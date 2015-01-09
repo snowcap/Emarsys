@@ -10,11 +10,11 @@ class CurlClient implements HttpClient
 	 * @param string $method
 	 * @param string $uri
 	 * @param string[] $headers
-	 * @param mixed $body
+	 * @param array $body
 	 * @return string
 	 * @throws ClientException
 	 */
-	public function send($method, $uri, $headers = [], $body = null)
+	public function send($method, $uri, array $headers = [], array $body = [])
 	{
 		$ch = curl_init();
 		$uri = $this->updateUri($method, $uri, $body);
@@ -42,12 +42,12 @@ class CurlClient implements HttpClient
 	/**
 	 * @param string $method
 	 * @param string $uri
-	 * @param mixed $body
+	 * @param array $body
 	 * @return string
 	 */
-	private function updateUri($method, $uri, $body)
+	private function updateUri($method, $uri, array $body)
 	{
-		if (self::GET == $method && is_array($body)) {
+		if (self::GET == $method) {
 			$uri .= '/' . http_build_query($body);
 		}
 

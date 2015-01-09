@@ -224,7 +224,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function createContact($data)
+    public function createContact(array $data)
     {
         return $this->send(HttpClient::POST, 'contact', $this->mapFieldsToIds($data));
     }
@@ -235,7 +235,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function updateContact($data)
+    public function updateContact(array $data)
     {
         return $this->send(HttpClient::PUT, 'contact', $this->mapFieldsToIds($data));
     }
@@ -267,7 +267,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function getContactChanges($data)
+    public function getContactChanges(array $data)
     {
         return $this->send(HttpClient::POST, 'contact/getchanges', $data);
     }
@@ -278,7 +278,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function getContactHistory($data)
+    public function getContactHistory(array $data)
     {
         return $this->send(HttpClient::POST, 'contact/getcontacthistory', $data);
     }
@@ -298,7 +298,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function getContactData($data)
+    public function getContactData(array $data)
     {
         return $this->send(HttpClient::POST, 'contact/getdata', $data);
     }
@@ -309,7 +309,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function getContactRegistrations($data)
+    public function getContactRegistrations(array $data)
     {
         return $this->send(HttpClient::POST, 'contact/getregistrations', $data);
     }
@@ -320,7 +320,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function getContactList($data)
+    public function getContactList(array $data)
     {
         return $this->send(HttpClient::GET, 'contactlist', $data);
     }
@@ -331,7 +331,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function createContactList($data)
+    public function createContactList(array $data)
     {
         return $this->send(HttpClient::POST, 'contactlist', $data);
     }
@@ -343,7 +343,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function addContactsToContactList($listId, $data)
+    public function addContactsToContactList($listId, array $data)
     {
         return $this->send(HttpClient::POST, sprintf('contactlist/%s/add', $listId), $data);
     }
@@ -355,7 +355,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function removeContactsFromContactList($listId, $data)
+    public function removeContactsFromContactList($listId, array $data)
     {
         return $this->send(HttpClient::POST, sprintf('contactlist/%s/delete', $listId), $data);
     }
@@ -402,12 +402,12 @@ class Client
      *      'browse' => 0,
      *  );
      *
-     * @param array|object $data
+     * @param array $data
      * @return Response
      */
-    public function createEmail($data)
+    public function createEmail(array $data)
     {
-        return $this->send(HttpClient::POST, 'email', (object)$data);
+        return $this->send(HttpClient::POST, 'email', $data);
     }
 
     /**
@@ -417,7 +417,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function getEmail($emailId, $data)
+    public function getEmail($emailId, array $data)
     {
         return $this->send(HttpClient::GET, sprintf('email/%s', $emailId), $data);
     }
@@ -429,7 +429,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function launchEmail($emailId, $data)
+    public function launchEmail($emailId, array $data)
     {
         return $this->send(HttpClient::POST, sprintf('email/%s/launch', $emailId), $data);
     }
@@ -441,7 +441,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function previewEmail($emailId, $data)
+    public function previewEmail($emailId, array $data)
     {
         return $this->send(HttpClient::POST, sprintf('email/%s/launch', $emailId), $data);
     }
@@ -453,7 +453,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function getEmailResponseSummary($emailId, $data)
+    public function getEmailResponseSummary($emailId, array $data)
     {
         return $this->send(HttpClient::POST, sprintf('email/%s/responsesummary', $emailId), $data);
     }
@@ -465,7 +465,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function sendEmailTest($emailId, $data)
+    public function sendEmailTest($emailId, array $data)
     {
         return $this->send(HttpClient::POST, sprintf('email/%s/sendtestmail', $emailId), $data);
     }
@@ -477,7 +477,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function getEmailUrl($emailId, $data)
+    public function getEmailUrl($emailId, array $data)
     {
         return $this->send(HttpClient::POST, sprintf('email/%s/url', $emailId), $data);
     }
@@ -488,7 +488,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function getEmailDeliveryStatus($data)
+    public function getEmailDeliveryStatus(array $data)
     {
         return $this->send(HttpClient::POST, 'email/getdeliverystatus', $data);
     }
@@ -499,7 +499,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function getEmailLaunches($data)
+    public function getEmailLaunches(array $data)
     {
         return $this->send(HttpClient::GET, 'email/getlaunchesofemail', $data);
     }
@@ -510,7 +510,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function getEmailResponses($data)
+    public function getEmailResponses(array $data)
     {
         return $this->send(HttpClient::POST, 'email/getresponses', $data);
     }
@@ -521,7 +521,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function getEmailCategories($data)
+    public function getEmailCategories(array $data)
     {
         return $this->send(HttpClient::GET, 'emailcategory', $data);
     }
@@ -532,7 +532,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function getEvents($data)
+    public function getEvents(array $data)
     {
         return $this->send(HttpClient::GET, 'event', $data);
     }
@@ -544,7 +544,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function triggerEvent($eventId, $data)
+    public function triggerEvent($eventId, array $data)
     {
         return $this->send(HttpClient::POST, sprintf('event/%s/trigger', $eventId), $data);
     }
@@ -555,7 +555,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function getExportStatus($data)
+    public function getExportStatus(array $data)
     {
         return $this->send(HttpClient::GET, 'export', $data);
     }
@@ -587,7 +587,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function getFiles($data)
+    public function getFiles(array $data)
     {
         return $this->send(HttpClient::GET, 'file', $data);
     }
@@ -598,7 +598,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function uploadFile($data)
+    public function uploadFile(array $data)
     {
         return $this->send(HttpClient::POST, 'file', $data);
     }
@@ -609,7 +609,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function getSegments($data)
+    public function getSegments(array $data)
     {
         return $this->send(HttpClient::GET, 'filter', $data);
     }
@@ -620,7 +620,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function getFolders($data)
+    public function getFolders(array $data)
     {
         return $this->send(HttpClient::GET, 'folder', $data);
     }
@@ -631,7 +631,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function getForms($data)
+    public function getForms(array $data)
     {
         return $this->send(HttpClient::GET, 'form', $data);
     }
@@ -670,10 +670,10 @@ class Client
     /**
      * Creates a new source for the customer with the specified name.
      *
-     * @param $data
+     * @param array $data
      * @return Response
      */
-    public function createSource($data)
+    public function createSource(array $data)
     {
         return $this->send(HttpClient::POST, 'source/create', $data);
     }
@@ -681,18 +681,14 @@ class Client
     /**
      * @param string $method
      * @param string $uri
-     * @param string|resource|array $body
+     * @param array $body
      * @return Response
      * @throws ServerException
      */
-    public function send($method = 'GET', $uri, $body = null)
+    public function send($method = 'GET', $uri, array $body = [])
     {
 	    $headers = ['Content-Type: application/json', 'X-WSSE: ' . $this->getAuthenticationSignature()];
 	    $uri = $this->baseUrl . $uri;
-
-	    if (!is_null($body)) {
-		    $body = json_encode($body);
-	    }
 
 	    try {
 		    $responseJson = $this->client->send($method, $uri, $headers, $body);
