@@ -21,7 +21,7 @@ class CurlClient implements HttpClient
 
 		if ($method != self::GET) {
 			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
 		}
 
 		curl_setopt($ch, CURLOPT_URL, $uri);
