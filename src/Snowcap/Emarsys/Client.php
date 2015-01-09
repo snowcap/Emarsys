@@ -701,18 +701,8 @@ class Client
 	    }
 
 	    $responseArray = json_decode($responseJson, true);
-	    $response = $this->getResponse($responseArray);
 
-	    return $response;
-    }
-
-    /**
-     * @param array $response
-     * @return Response
-     */
-    public function getResponse(array $response)
-    {
-        return new Response($response);
+	    return new Response($responseArray);
     }
 
     /**
