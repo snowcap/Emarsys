@@ -4,7 +4,7 @@ namespace Snowcap\Emarsys;
 
 /**
  * @covers \Snowcap\Emarsys\Client
- * @covers \Snowcap\Emarsys\Response
+ * @uses \Snowcap\Emarsys\Response
  */
 class ClientTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,18 +14,14 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     private $client;
 
 	/**
-	 * @var |PHpUnit_Framework_MockObject_MockObject|HttpClient
+	 * @var \PHPUnit_Framework_MockObject_MockObject|HttpClient
 	 */
 	private $httpClient;
 
     protected function setUp()
     {
 	    $this->httpClient = $this->getMock(HttpClient::class);
-
-	    $this->client = $this->getMockBuilder(Client::class)
-		    ->setMethods(array('send'))
-		    ->setConstructorArgs(array($this->httpClient, 'dummy-api-username', 'dummy-api-secret'))
-	        ->getMock();
+	    $this->client = new Client($this->httpClient, 'dummy-api-username', 'dummy-api-secret');
     }
 
 	public function testItAddsFieldsMapping()
@@ -141,8 +137,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEmails()
     {
-        $expectedResponse = new Response($this->createExpectedResponse('emails'));
-        $this->client->expects($this->any())->method('send')->will($this->returnValue($expectedResponse));
+        $expectedResponse = $this->createExpectedResponse('emails');
+        $this->httpClient->expects($this->any())
+	        ->method('send')
+	        ->willReturn($expectedResponse);
 
         $response = $this->client->getEmails();
 
@@ -171,8 +169,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateEmail()
     {
-        $expectedResponse = new Response($this->createExpectedResponse('createContact'));
-        $this->client->expects($this->any())->method('send')->will($this->returnValue($expectedResponse));
+        $expectedResponse = $this->createExpectedResponse('createContact');
+	    $this->httpClient->expects($this->any())
+		    ->method('send')
+		    ->willReturn($expectedResponse);
 
         $data = array(
             'language' => 'en',
@@ -197,65 +197,33 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testGetContactIdSuccess()
     {
-        $expectedResponse = new Response($this->createExpectedResponse('getContactId'));
-        $this->client->expects($this->once())->method('send')->will($this->returnValue($expectedResponse));
+        $expectedResponse = $this->createExpectedResponse('getContactId');
+	    $this->httpClient->expects($this->any())
+		    ->method('send')
+		    ->willReturn($expectedResponse);
 
         $response = $this->client->getContactId('3', 'sender@example.com');
 
-        $expectedData = $expectedResponse->getData();
-        $this->assertEquals($expectedData['id'], $response);
+        $expectedData = json_decode($expectedResponse, true);
+        $this->assertEquals($expectedData['data']['id'], $response);
     }
-
-	/**
-	 * @expectedException \Snowcap\Emarsys\Exception\ClientException
-	 * @expectedExceptionMessage Invalid result structure
-	 */
-	public function testItThrowsClientException()
-	{
-		$dummyResult = array('dummy');
-		new Response($dummyResult);
-	}
-
-	public function testItGetsResponseData()
-	{
-		$result = (new Response($this->createExpectedResponse('createContact')))->getData();
-
-		$this->assertInternalType('array', $result);
-		$this->assertNotEmpty($result);
-
-	}
-
-	public function testItSetsAndGetsReplyCode()
-	{
-		$result = (new Response($this->createExpectedResponse('createContact')))->getReplyCode();
-
-		$this->assertSame(Response::REPLY_CODE_OK, $result);
-	}
-
-	public function testItSetsAndGetsReplyText()
-	{
-		$result = (new Response($this->createExpectedResponse('createContact')))->getReplyText();
-
-		$this->assertEquals('OK', $result);
-	}
 
 	public function testItReturnsContactData()
 	{
-		$expectedResponse = new Response($this->createExpectedResponse('getContactData'));
-		$this->client->expects($this->once())
+		$expectedResponse = $this->createExpectedResponse('getContactData');
+		$this->httpClient->expects($this->once())
 			->method('send')
 			->willReturn($expectedResponse);
 
 		$response = $this->client->getContactData(array());
 
-		$this->assertEquals($expectedResponse, $response);
-
+		$this->assertInstanceOf(Response::class, $response);
 	}
 
 	public function testItCreatesContact()
 	{
-		$expectedResponse = new Response($this->createExpectedResponse('createContact'));
-		$this->client->expects($this->once())
+		$expectedResponse = $this->createExpectedResponse('createContact');
+		$this->httpClient->expects($this->once())
 			->method('send')
 			->willReturn($expectedResponse);
 
@@ -265,7 +233,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 		);
 		$response = $this->client->createContact($data);
 
-		$this->assertEquals($expectedResponse, $response);
+		$this->assertInstanceOf(Response::class, $response);
 	}
 
 	/**
@@ -278,6 +246,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     {
         $fileContent = file_get_contents(__DIR__ . '/TestData/' . $fileName . '.json');
 
-        return json_decode($fileContent, true);
+        return $fileContent;
     }
 }
