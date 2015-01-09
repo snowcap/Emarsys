@@ -2,7 +2,6 @@
 
 namespace Snowcap\Emarsys;
 
-
 use Snowcap\Emarsys\Exception\ClientException;
 
 class Response
@@ -16,7 +15,6 @@ class Response
     const REPLY_CODE_INVALID_STATUS = 6003;
     const REPLY_CODE_INVALID_DATA = 10001;
 
-
     /**
      * @var int
      */
@@ -28,30 +26,21 @@ class Response
     /**
      * @var array
      */
-    protected $data = array();
+    protected $data = [];
 
     /**
      * @param array $result
-     * @throws Exception\ClientException
+     * @throws ClientException
      */
-    function __construct(array $result = array())
+    function __construct(array $result = [])
     {
-        if (count($result) > 0) {
-            if (!isset($result['replyCode']) || !isset($result['replyText']) || !isset($result['data'])) {
-                throw new ClientException('Invalid result structure');
-            }
-            $this->replyCode = $result['replyCode'];
-            $this->replyText = $result['replyText'];
-            $this->data = $result['data'];
+        if (!isset($result['replyCode']) || !isset($result['replyText']) || !isset($result['data'])) {
+            throw new ClientException('Invalid result structure');
         }
-    }
 
-    /**
-     * @param array $data
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
+        $this->replyCode = $result['replyCode'];
+        $this->replyText = $result['replyText'];
+        $this->data = $result['data'];
     }
 
     /**
@@ -63,27 +52,11 @@ class Response
     }
 
     /**
-     * @param int $replyCode
-     */
-    public function setReplyCode($replyCode)
-    {
-        $this->replyCode = $replyCode;
-    }
-
-    /**
      * @return int
      */
     public function getReplyCode()
     {
         return $this->replyCode;
-    }
-
-    /**
-     * @param string $replyText
-     */
-    public function setReplyText($replyText)
-    {
-        $this->replyText = $replyText;
     }
 
     /**
@@ -93,5 +66,4 @@ class Response
     {
         return $this->replyText;
     }
-
 }
