@@ -47,6 +47,11 @@ class Client
     private $choicesMapping = array();
 
     /**
+     * @var array
+     */
+    private $systemFields = ['key_id', 'id'];
+
+    /**
      * @param HttpClient $client HTTP client implementation
      * @param string $username The username requested by the Emarsys API
      * @param string $secret The secret requested by the Emarsys API
@@ -130,6 +135,10 @@ class Client
      */
     public function getFieldId($field)
     {
+        if (in_array($field, $this->systemFields)) {
+            return $field;
+        }
+
         if (!isset($this->fieldsMapping[$field])) {
 	        throw new ClientException(sprintf('Unrecognized field name "%s"', $field));
         }
