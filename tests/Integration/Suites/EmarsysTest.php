@@ -34,7 +34,7 @@ class EmarsysTest extends \PHPUnit_Framework_TestCase
 	public function itShouldGetAvailableLanguages()
 	{
 		$response = $this->client->getLanguages();
-		$expectation = ['id' => 'en', 'language' => 'english'];
+		$expectation = array('id' => 'en', 'language' => 'english');
 
 		$this->assertContains($expectation, $response->getData());
 	}
@@ -45,7 +45,7 @@ class EmarsysTest extends \PHPUnit_Framework_TestCase
 	public function itShouldGetAvailableFields()
 	{
 		$response = $this->client->getFields();
-		$expectation = ['id' => 1, 'name' => 'First Name', 'application_type' => 'shorttext'];
+		$expectation = array('id' => 1, 'name' => 'First Name', 'application_type' => 'shorttext');
 
 		$this->assertContains($expectation, $response->getData());
 	}

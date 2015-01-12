@@ -26,13 +26,13 @@ class Response
     /**
      * @var array
      */
-    protected $data = [];
+    protected $data = array();
 
     /**
      * @param array $result
      * @throws ClientException
      */
-    function __construct(array $result = [])
+    function __construct(array $result = array())
     {
         if (!isset($result['replyCode']) || !isset($result['replyText']) || !isset($result['data'])) {
             throw new ClientException('Invalid result structure');

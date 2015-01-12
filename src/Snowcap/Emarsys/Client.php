@@ -49,7 +49,7 @@ class Client
     /**
      * @var array
      */
-    private $systemFields = ['key_id', 'id'];
+    private $systemFields = array('key_id', 'id');
 
     /**
      * @param HttpClient $client HTTP client implementation
@@ -694,9 +694,9 @@ class Client
      * @return Response
      * @throws ServerException
      */
-    private function send($method = 'GET', $uri, array $body = [])
+    private function send($method = 'GET', $uri, array $body = array())
     {
-	    $headers = ['Content-Type: application/json', 'X-WSSE: ' . $this->getAuthenticationSignature()];
+	    $headers = array('Content-Type: application/json', 'X-WSSE: ' . $this->getAuthenticationSignature());
 	    $uri = $this->baseUrl . $uri;
 
 	    try {

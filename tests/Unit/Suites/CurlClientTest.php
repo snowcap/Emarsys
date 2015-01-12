@@ -27,7 +27,7 @@ class CurlClientTest extends \PHPUnit_Framework_TestCase
 
 	public function testRequestReturnsOutput()
 	{
-		$result = $this->client->send('GET', 'http://google.com', [], ['foo' => 'bar']);
+		$result = $this->client->send('GET', 'http://google.com', array(), array('foo' => 'bar'));
 
 		$this->assertContains('<HTML', $result);
 	}

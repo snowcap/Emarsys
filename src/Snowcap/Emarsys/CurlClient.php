@@ -14,7 +14,7 @@ class CurlClient implements HttpClient
 	 * @return string
 	 * @throws ClientException
 	 */
-	public function send($method, $uri, array $headers = [], array $body = [])
+	public function send($method, $uri, array $headers = array(), array $body = array())
 	{
 		$ch = curl_init();
 		$uri = $this->updateUri($method, $uri, $body);

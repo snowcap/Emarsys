@@ -20,9 +20,9 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 	public function testItGetsResponseData()
 	{
 		$expectedResponse = $this->createExpectedResponse('createContact');
-		$result = (new Response($expectedResponse))->getData();
+		$result = new Response($expectedResponse);
 
-		$this->assertInternalType('array', $result);
+		$this->assertInternalType('array', $result->getData());
 		$this->assertNotEmpty($result);
 
 	}
@@ -30,17 +30,17 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 	public function testItSetsAndGetsReplyCode()
 	{
 		$expectedResponse = $this->createExpectedResponse('createContact');
-		$result = (new Response($expectedResponse))->getReplyCode();
+		$result = new Response($expectedResponse);
 
-		$this->assertSame(Response::REPLY_CODE_OK, $result);
+		$this->assertSame(Response::REPLY_CODE_OK, $result->getReplyCode());
 	}
 
 	public function testItSetsAndGetsReplyText()
 	{
 		$expectedResponse = $this->createExpectedResponse('createContact');
-		$result = (new Response($expectedResponse))->getReplyText();
+		$result = new Response($expectedResponse);
 
-		$this->assertEquals('OK', $result);
+		$this->assertEquals('OK', $result->getReplyText());
 	}
 
 	/**

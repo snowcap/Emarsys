@@ -20,7 +20,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-	    $this->httpClient = $this->getMock(HttpClient::class);
+	    $this->httpClient = $this->getMock('\Snowcap\Emarsys\HttpClient');
 	    $this->client = new Client($this->httpClient, 'dummy-api-username', 'dummy-api-secret');
     }
 
@@ -217,7 +217,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
 		$response = $this->client->getContactData(array());
 
-		$this->assertInstanceOf(Response::class, $response);
+		$this->assertInstanceOf('\Snowcap\Emarsys\Response', $response);
 	}
 
 	public function testItCreatesContact()
@@ -233,7 +233,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 		);
 		$response = $this->client->createContact($data);
 
-		$this->assertInstanceOf(Response::class, $response);
+		$this->assertInstanceOf('\Snowcap\Emarsys\Response', $response);
 	}
 
 	/**
