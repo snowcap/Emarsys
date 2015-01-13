@@ -27,13 +27,14 @@ require 'vendor/autoload.php';
 
 ### Basics
 
-To use the client, you just need to instanciate a new one with your credentials
+To use the client, you need to instantiate a new one with your credentials. You also need to create an HTTP client and inject it into Emarsys Client. Snowcap/Emarsys is shipped with cURL HTTP client but it can be replaced with any other custom implementation.
 
 ```php
 define('EMARSYS_API_USERNAME', 'your_username');
 define('EMARSYS_API_SECRET', 'your_secret');
-// ...
-$client = new Client(EMARSYS_API_USERNAME, EMARSYS_API_SECRET);
+
+$httpClient = new CurlClient();
+$client = new Client($httpClient, EMARSYS_API_USERNAME, EMARSYS_API_SECRET);
 ```
 
 At this point, you have access to all the methods implemented by the Emarsys API
@@ -48,10 +49,20 @@ $response = $client->getContact(array(3 => 'example@example.com'));
 $response = $client->createContact(array(3 => 'example@example.com'));
 
 // Create a more complex contact
-$response = $client->createContact(array(1 => 'John', 2 => 'Doe', 3 => 'example@example.com'));
+$response = $client->createContact(array(
+    'email' => 'johndoe@gmail.com',
+    'gender' => $client->getChoiceId('gender', 'male'),
+    'salutation' => $client->getChoiceId('salutation', 'mr'),
+    'firstName' => 'John',
+    'lastName' => 'Doe',
+    'birthDate' => '2014-03-27',
+    'address' => 'Forgotten street 85B',
+    'zip' => '1000',
+    'city' => 'Brussels',
+    'country' => 17,
+    'language' => 3,
+));
 ```
-
-You can find detailed examples in the `examples` directory.
 
 ### Custom field mapping
 
@@ -167,4 +178,4 @@ The _ServerException_ is carrying the original reply text and reply code sent by
 
 Some of the reply codes have already been handled as constants, but not all.
 
-This could be very useful, for example : we could check the exception code to see if the contact was not found, then we could create it. See the `examples` directory to see it in action.
+This could be very useful, for example : we could check the exception code to see if the contact was not found, then we could create it.

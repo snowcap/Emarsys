@@ -1,5 +1,2 @@
 /vendor/
-/examples/config.php
 /composer.lock
-phpunit.xml
-.idea/
