@@ -686,7 +686,19 @@ class Client
     {
         return $this->send(HttpClient::POST, 'source/create', $data);
     }
-
+    
+    /**
+    * creates custom field in your Emarsys account
+    *
+    * @param string $name
+    * @param string $type shorttext|longtext|largetext|date|url|numeric
+    *
+    * @return Response
+    */
+    public function createCustomField($name, $type){
+	return $this->send(HttpClient::POST, 'field', array('name'=>$name, 'application_type'=>$type));
+    }
+    
     /**
      * @param string $method
      * @param string $uri
