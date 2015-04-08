@@ -694,7 +694,7 @@ class Client
      * @return Response
      * @throws ServerException
      */
-    private function send($method = 'GET', $uri, array $body = array())
+    protected function send($method = 'GET', $uri, array $body = array())
     {
 	    $headers = array('Content-Type: application/json', 'X-WSSE: ' . $this->getAuthenticationSignature());
 	    $uri = $this->baseUrl . $uri;
