@@ -30,11 +30,13 @@ class CurlClient implements HttpClient
 
 		$output = curl_exec($ch);
 
-		curl_close($ch);
-
-		if (false == $output) {
-			throw new ClientException();
+		if (false === $output) {
+			$message = 'Curl error "'.curl_error($ch)."\" \nCurl error number ".curl_errno($ch)." see http://curl.haxx.se/libcurl/c/libcurl-errors.html";
+			curl_close($ch);
+			throw new ClientException($message);
 		}
+		
+		curl_close($ch);
 
 		return $output;
 	}
