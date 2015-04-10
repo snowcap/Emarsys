@@ -246,6 +246,12 @@ class Client
      */
     public function updateContact(array $data)
     {
+        if (isset($data['contacts']) && is_array($data['contacts'])){
+            foreach($data['contacts'] as &$v){
+                $v = $this->mapFieldsToIds($v);
+            }
+        }
+        
         return $this->send(HttpClient::PUT, 'contact', $this->mapFieldsToIds($data));
     }
 
