@@ -236,8 +236,8 @@ class Client
     public function createContact(array $data)
     {
         if (isset($data['contacts']) && is_array($data['contacts'])){
-	    foreach($data['contacts'] as &$v){
-	        $v = $this->mapFieldsToIds($v);
+	    foreach($data['contacts'] as &$contact){
+	        $contact = $this->mapFieldsToIds($contact);
 	    }
         }
     	
