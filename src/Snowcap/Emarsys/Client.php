@@ -510,7 +510,7 @@ class Client
      */
     public function getEmailLaunches(array $data)
     {
-        return $this->send(HttpClient::GET, 'email/getlaunchesofemail', $data);
+        return $this->send(HttpClient::POST, 'email/getlaunchesofemail', $data);
     }
 
     /**
