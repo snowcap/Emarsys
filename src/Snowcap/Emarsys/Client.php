@@ -49,7 +49,7 @@ class Client
     /**
      * @var array
      */
-    private $systemFields = array('key_id', 'id');
+    private $systemFields = array('key_id', 'id', 'contacts');
 
     /**
      * @param HttpClient $client HTTP client implementation
@@ -235,6 +235,12 @@ class Client
      */
     public function createContact(array $data)
     {
+        if (isset($data['contacts']) && is_array($data['contacts'])){
+	    foreach($data['contacts'] as &$contact){
+	        $contact = $this->mapFieldsToIds($contact);
+	    }
+        }
+    	
         return $this->send(HttpClient::POST, 'contact', $this->mapFieldsToIds($data));
     }
 
