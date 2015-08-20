@@ -121,7 +121,7 @@ class Client
 				    $this->choicesMapping[$field] = array();
 			    }
 
-			    $this->choicesMapping[$field] = xfarray_merge($this->choicesMapping[$field], $choices);
+			    $this->choicesMapping[$field] = array_merge($this->choicesMapping[$field], $choices);
 		    }
 	    }
     }
