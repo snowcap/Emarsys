@@ -553,9 +553,9 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function getEvents(array $data)
+    public function getEvents()
     {
-        return $this->send(HttpClient::GET, 'event', $data);
+        return $this->send(HttpClient::GET, 'event');
     }
 
     /**
