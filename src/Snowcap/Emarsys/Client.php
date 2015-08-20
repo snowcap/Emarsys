@@ -121,7 +121,7 @@ class Client
 				    $this->choicesMapping[$field] = array();
 			    }
 
-			    $this->choicesMapping[$field] = array_merge($this->choicesMapping[$field], $choices);
+			    $this->choicesMapping[$field] = xfarray_merge($this->choicesMapping[$field], $choices);
 		    }
 	    }
     }
@@ -550,7 +550,6 @@ class Client
     /**
      * Returns a list of external events which can be used in program s .
      *
-     * @param array $data
      * @return Response
      */
     public function getEvents()
