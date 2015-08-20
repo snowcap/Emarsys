@@ -550,12 +550,11 @@ class Client
     /**
      * Returns a list of external events which can be used in program s .
      *
-     * @param array $data
      * @return Response
      */
-    public function getEvents(array $data)
+    public function getEvents()
     {
-        return $this->send(HttpClient::GET, 'event', $data);
+        return $this->send(HttpClient::GET, 'event');
     }
 
     /**
