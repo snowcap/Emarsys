@@ -49,7 +49,7 @@ class Client
     /**
      * @var array
      */
-    private $systemFields = array('key_id', 'id', 'contacts');
+    private $systemFields = array('key_id', 'id', 'contacts', 'uid');
 
     /**
      * @param HttpClient $client HTTP client implementation
