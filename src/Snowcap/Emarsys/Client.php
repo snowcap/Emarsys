@@ -729,7 +729,9 @@ class Client
 	    }
 
 	    $responseArray = json_decode($responseJson, true);
-
+            if($responseArray === null) {
+              throw new ServerException("JSON response couldn't be decoded\n{$responseJson}\n");
+            }
 	    return new Response($responseArray);
     }
 
