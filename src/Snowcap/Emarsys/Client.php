@@ -21,7 +21,7 @@ class Client
     /**
      * @var string
      */
-    private $baseUrl;
+    private $baseUrl = 'https://suite6.emarsys.net/api/v2/';
     /**
      * @var string
      */
@@ -55,12 +55,12 @@ class Client
      * @param HttpClient $client HTTP client implementation
      * @param string $username The username requested by the Emarsys API
      * @param string $secret The secret requested by the Emarsys API
-     * @param string $baseUrl BaseUrl
+     * @param string $baseUrl Overrides the default baseUrl if needed
      * @param array $fieldsMap Overrides the default fields mapping if needed
      * @param array $choicesMap Overrides the default choices mapping if needed
      */
     public function __construct(
-        HttpClient $client, $username, $secret, $baseUrl, $fieldsMap = array(), $choicesMap = array()
+        HttpClient $client, $username, $secret, $baseUrl = null, $fieldsMap = array(), $choicesMap = array()
     )
     {
 	    $this->client = $client;
