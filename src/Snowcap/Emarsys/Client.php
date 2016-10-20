@@ -706,8 +706,9 @@ class Client
     *
     * @return Response
     */
-    public function createCustomField($name, $type){
-	return $this->send(HttpClient::POST, 'field', array('name'=>$name, 'application_type'=>$type));
+    public function createCustomField($name, $type)
+    {
+        return $this->send(HttpClient::POST, 'field', array('name'=>$name, 'application_type'=>$type));
     }
     
     /**
