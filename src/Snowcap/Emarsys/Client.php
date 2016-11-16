@@ -154,7 +154,7 @@ class Client
      */
     public function getFieldName($fieldId)
     {
-        $fieldName = array_search($fieldId, $this->fieldsMapping);
+        $fieldName = array_search($fieldId, $this->fieldsMapping, true);
 
         if ($fieldName) {
             return $fieldName;
@@ -258,7 +258,7 @@ class Client
             }
         }
         
-        return $this->send(HttpClient::PUT, 'contact' . ($createIfNotExists ? '?create_if_not_exists=1' : ''), $this->mapFieldsToIds($data));
+        return $this->send(HttpClient::PUT, 'contact' . ($createIfNotExists ? '/?create_if_not_exists=1' : ''), $this->mapFieldsToIds($data));
     }
 
     /**
@@ -764,7 +764,7 @@ class Client
     }
 
     /**
-     * Convert field names to field ids
+     * Convert field names to field ids and choice values to choice ids
      *
      * @param array $data
      * @return array
@@ -774,11 +774,20 @@ class Client
         $mappedData = array();
 
         foreach ($data as $name => $value) {
+
             if (is_numeric($name)) {
-                $mappedData[(int)$name] = $value;
+                $fieldId = (int)$name;
+                $fieldName = $this->getFieldName($fieldId);
             } else {
-                $mappedData[$this->getFieldId($name)] = $value;
+                $fieldId = $this->getFieldId($name);
+                $fieldName = $name;
             }
+
+            if (isset($this->choicesMapping[$fieldName])) {
+                $value = $this->getChoiceId($fieldName,$value);
+            }
+
+            $mappedData[$fieldId] = $value;
         }
 
         return $mappedData;
