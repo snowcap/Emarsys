@@ -250,7 +250,7 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function updateContact(array $data)
+    public function updateContact(array $data, $createIfNotExists = false)
     {
         if (isset($data['contacts']) && is_array($data['contacts'])){
             foreach($data['contacts'] as &$contact){
@@ -258,7 +258,7 @@ class Client
             }
         }
         
-        return $this->send(HttpClient::PUT, 'contact', $this->mapFieldsToIds($data));
+        return $this->send(HttpClient::PUT, 'contact' . ($createIfNotExists ? '?create_if_not_exists=1' : ''), $this->mapFieldsToIds($data));
     }
 
     /**
