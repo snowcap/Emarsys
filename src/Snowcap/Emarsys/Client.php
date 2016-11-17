@@ -360,6 +360,17 @@ class Client
     }
 
     /**
+     * Deletes a contact list which can be used as recipient source for the email.
+     *
+     * @param string $listId
+     * @return Response
+     */
+    public function deleteContactList($listId)
+    {
+        return $this->send(HttpClient::POST, sprintf('contactlist/%s/deletelist', $listId));
+    }
+
+    /**
      * Creates a contact list which can be used as recipient source for the email.
      *
      * @param string $listId
