@@ -395,6 +395,18 @@ class Client
     }
 
     /**
+     * Get a list of contact IDs that are in a contact list
+     *
+     * @param string $listId
+     * @param array $data
+     * @return Response
+     */
+    public function getContactsFromContactList($listId, array $data)
+    {
+        return $this->send(HttpClient::GET, sprintf('contactlist/%s/contacts', $listId), $data);
+    }
+
+    /**
      * Returns a list of emails.
      *
      * @param int|null $status
