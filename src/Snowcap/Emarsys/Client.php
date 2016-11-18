@@ -264,6 +264,17 @@ class Client
     }
 
     /**
+     * Deletes a single contact/recipient, identified by an external ID.
+     *
+     * @param array $data
+     * @return Response
+     */
+    public function deleteContact(array $data)
+    {
+        return $this->send(HttpClient::POST, 'contact/delete', $data);
+    }
+
+    /**
      * Returns the internal ID of a contact specified by its external ID.
      *
      * @param string $fieldId
