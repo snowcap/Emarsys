@@ -264,6 +264,17 @@ class Client
     }
 
     /**
+     * Deletes a single contact/recipient, identified by an external ID.
+     *
+     * @param array $data
+     * @return Response
+     */
+    public function deleteContact(array $data)
+    {
+        return $this->send(HttpClient::POST, 'contact/delete', $data);
+    }
+
+    /**
      * Returns the internal ID of a contact specified by its external ID.
      *
      * @param string $fieldId
@@ -360,6 +371,17 @@ class Client
     }
 
     /**
+     * Deletes a contact list which can be used as recipient source for the email.
+     *
+     * @param string $listId
+     * @return Response
+     */
+    public function deleteContactList($listId)
+    {
+        return $this->send(HttpClient::POST, sprintf('contactlist/%s/deletelist', $listId));
+    }
+
+    /**
      * Creates a contact list which can be used as recipient source for the email.
      *
      * @param string $listId
@@ -381,6 +403,18 @@ class Client
     public function removeContactsFromContactList($listId, array $data)
     {
         return $this->send(HttpClient::POST, sprintf('contactlist/%s/delete', $listId), $data);
+    }
+
+    /**
+     * Get a list of contact IDs that are in a contact list
+     *
+     * @param string $listId
+     * @param array $data
+     * @return Response
+     */
+    public function getContactsFromContactList($listId, array $data)
+    {
+        return $this->send(HttpClient::GET, sprintf('contactlist/%s/contacts', $listId), $data);
     }
 
     /**
