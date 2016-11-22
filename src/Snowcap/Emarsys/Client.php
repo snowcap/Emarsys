@@ -418,13 +418,11 @@ class Client
     }
 
     /**
-     * Checks whether a specific contact is included in the defined contact list.
+     * Check whether a specific contact is included in the defined contact list.
      *
-     * @param integer $contactId
-     * @param integer $listId
-     *
+     * @param int $contactId
+     * @param int $listId
      * @return Response
-     *
      * @link http://documentation.emarsys.com/resource/developers/endpoints/contacts/check-a-contact-in-a-contact-list/
      */
     public function checkContactInList($contactId, $listId)
