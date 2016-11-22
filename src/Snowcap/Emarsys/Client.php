@@ -418,6 +418,21 @@ class Client
     }
 
     /**
+     * Checks whether a specific contact is included in the defined contact list.
+     *
+     * @param integer $contactId
+     * @param integer $listId
+     *
+     * @return Response
+     *
+     * @link http://documentation.emarsys.com/resource/developers/endpoints/contacts/check-a-contact-in-a-contact-list/
+     */
+    public function checkContactInList($contactId, $listId)
+    {
+        return $this->send(HttpClient::GET, sprintf('contactlist/%s/contacts/%s', $listId, $contactId));
+    }
+
+    /**
      * Returns a list of emails.
      *
      * @param int|null $status
