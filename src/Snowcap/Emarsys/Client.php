@@ -418,7 +418,7 @@ class Client
     }
 
     /**
-     * Check whether a specific contact is included in the defined contact list.
+     * Checks whether a specific contact is included in the defined contact list.
      *
      * @param int $contactId
      * @param int $listId
