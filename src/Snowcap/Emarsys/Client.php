@@ -250,9 +250,12 @@ class Client
      * Updates one or more contacts/recipients, identified by an external ID.
      *
      * @param array $data
+     * @param bool $createIfNotExists When enabled, if the contact does not exist in the database, it is created
+     * automatically.
      * @return Response
+     * @link http://documentation.emarsys.com/resource/developers/endpoints/contacts/update-contacts/
      */
-    public function updateContact(array $data)
+    public function updateContact(array $data, $createIfNotExists = false)
     {
         if (isset($data['contacts']) && is_array($data['contacts'])){
             foreach($data['contacts'] as &$contact){
@@ -260,7 +263,11 @@ class Client
             }
         }
 
-        return $this->send(HttpClient::PUT, 'contact', $this->mapFieldsToIds($data));
+        return $this->send(
+            HttpClient::PUT,
+            sprintf('contact/?create_if_not_exists=%s', (int)$createIfNotExists),
+            $this->mapFieldsToIds($data)
+        );
     }
 
     /**
