@@ -289,7 +289,7 @@ class Client
         $data = $response->getData();
 
         if (isset($data['id'])) {
-            return (int)$data['id'];
+            return $data['id'];
         }
 
         throw new ClientException($response->getReplyText(), $response->getReplyCode());
