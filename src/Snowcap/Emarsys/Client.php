@@ -280,7 +280,7 @@ class Client
      * @param string $fieldId
      * @param string $fieldValue
      * @throws Exception\ClientException
-     * @return Response
+     * @return int
      */
     public function getContactId($fieldId, $fieldValue)
     {
@@ -292,7 +292,7 @@ class Client
             return $data['id'];
         }
 
-        throw new ClientException('Missing "id" in response');
+        throw new ClientException($response->getReplyText(), $response->getReplyCode());
     }
 
     /**
