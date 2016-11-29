@@ -237,11 +237,7 @@ class Client
      */
     public function createContact(array $data)
     {
-        if (isset($data['contacts']) && is_array($data['contacts'])){
-            foreach($data['contacts'] as &$contact){
-                $contact = $this->mapFieldsToIds($contact);
-            }
-        }
+        $data = $this->mapFieldsForMultipleContacts($data);
 
         return $this->send(HttpClient::POST, 'contact', $this->mapFieldsToIds($data));
     }
@@ -254,13 +250,23 @@ class Client
      */
     public function updateContact(array $data)
     {
-        if (isset($data['contacts']) && is_array($data['contacts'])){
-            foreach($data['contacts'] as &$contact){
-                $contact = $this->mapFieldsToIds($contact);
-            }
-        }
+        $data = $this->mapFieldsForMultipleContacts($data);
 
         return $this->send(HttpClient::PUT, 'contact', $this->mapFieldsToIds($data));
+    }
+
+    /**
+     * Updates one or more contacts/recipients, identified by an external ID. If the contact does not exist in the
+     * database, it is created.
+     *
+     * @param array $data
+     * @return Response
+     */
+    public function updateContactAndCreateIfNotExists(array $data)
+    {
+        $data = $this->mapFieldsForMultipleContacts($data);
+
+        return $this->send(HttpClient::PUT, 'contact/?create_if_not_exists=1', $this->mapFieldsToIds($data));
     }
 
     /**
@@ -860,4 +866,18 @@ class Client
 
         return $data;
     }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    private function mapFieldsForMultipleContacts(array $data)
+    {
+        if (!isset($data['contacts']) || !is_array($data['contacts'])) {
+            return $data;
+        }
+
+        return array_merge($data, ['contacts' => array_map([$this, 'mapFieldsToIds'], $data['contacts'])]);
+    }
+
 }
