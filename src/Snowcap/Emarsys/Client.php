@@ -873,13 +873,11 @@ class Client
      */
     private function mapFieldsForMultipleContacts(array $data)
     {
-        if (isset($data['contacts']) && is_array($data['contacts'])) {
-            foreach ($data['contacts'] as &$contact) {
-                $contact = $this->mapFieldsToIds($contact);
-            }
+        if (!isset($data['contacts']) || !is_array($data['contacts'])) {
+            return $data;
         }
 
-        return $data;
+        return array_merge($data, ['contacts' => array_map([$this, 'mapFieldsToIds'], $data['contacts'])]);
     }
 
 }
