@@ -34,7 +34,7 @@ class Response
      */
     function __construct(array $result = array())
     {
-        if (!isset($result['replyCode']) || !isset($result['replyText']) || !isset($result['data'])) {
+        if (!isset($result['replyCode']) || !isset($result['replyText']) || !array_key_exists('data', $result)) {
             throw new ClientException('Invalid result structure');
         }
 
