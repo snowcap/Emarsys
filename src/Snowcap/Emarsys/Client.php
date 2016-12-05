@@ -432,6 +432,21 @@ class Client
     }
 
     /**
+     * Deletes and email campaign in eMarketing Suite
+     * Example :
+     *   $data = array(
+     *       'emailId' => '1523',
+     *   );
+     *
+     * @param array $data
+     * @return Response
+     */
+    public function deleteEmail(array $data)
+    {
+        return $this->send(HttpClient::POST, 'email/delete', $data);
+    }
+
+    /**
      * Returns the attributes of an email and the personalized text and HTML source.
      *
      * @param string $emailId
