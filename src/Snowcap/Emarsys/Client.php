@@ -592,6 +592,17 @@ class Client
     }
 
     /**
+     * Count the unsubscription statistics of a specific campaign.
+     *
+     * @param array $data
+     * @return Response
+     */
+    public function setEmailUnsubscriptionCount(array $data)
+    {
+        return $this->send(HttpClient::POST, 'email/unsubscribe', $data);
+    }
+
+    /**
      * Returns a list of email categories which can be used in email creation.
      *
      * @param array $data
