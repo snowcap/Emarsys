@@ -592,6 +592,17 @@ class Client
     }
 
     /**
+     * Flags contacts as unsubscribed for an email campaign launch so they will be included in the campaign statistics.
+     *
+     * @param array $data
+     * @return Response
+     */
+    public function unsubscribeEmail(array $data)
+    {
+        return $this->send(HttpClient::POST, 'email/unsubscribe', $data);
+    }
+
+    /**
      * Returns a list of email categories which can be used in email creation.
      *
      * @param array $data
