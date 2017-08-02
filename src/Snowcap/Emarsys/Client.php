@@ -785,7 +785,7 @@ class Client
      *
      * @return Response
      */
-    public function addToBlacklist(array $emails = array(), array $domains = array())
+    public function addBlacklistEntries(array $emails = array(), array $domains = array())
     {
         return $this->send(HttpClient::POST, 'blacklist', array('emails' => $emails, 'domains' => $domains));
     }
