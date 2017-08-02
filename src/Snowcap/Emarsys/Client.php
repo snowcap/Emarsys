@@ -778,6 +778,19 @@ class Client
     }
 
     /**
+     * Adds list of emails and domains to blacklist
+     *
+     * @param array $emails
+     * @param array $domains
+     *
+     * @return Response
+     */
+    public function addBlacklistEntries(array $emails = array(), array $domains = array())
+    {
+        return $this->send(HttpClient::POST, 'blacklist', array('emails' => $emails, 'domains' => $domains));
+    }
+
+    /**
      * @param string $method
      * @param string $uri
      * @param array $body
