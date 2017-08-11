@@ -810,6 +810,15 @@ class Client
 
         $responseArray = json_decode($responseJson, true);
 
+        if ($responseArray === null) {
+            switch (json_last_error()) {
+                case JSON_ERROR_DEPTH:
+                    throw new ClientException("JSON response could not be decoded, maximum depth reached\n$responseJson");
+                default:
+                    throw new ServerException("JSON response could not be decoded\n$responseJson");
+            }
+        }
+
         return new Response($responseArray);
     }
 
