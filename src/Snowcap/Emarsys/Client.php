@@ -795,6 +795,7 @@ class Client
      * @param string $uri
      * @param array $body
      * @return Response
+     * @throws ClientException
      * @throws ServerException
      */
     protected function send($method = 'GET', $uri, array $body = array())
