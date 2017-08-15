@@ -138,9 +138,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     public function testGetEmails()
     {
         $expectedResponse = $this->createExpectedResponse('emails');
-        $this->httpClient->expects($this->any())
-	        ->method('send')
-	        ->willReturn($expectedResponse);
+        $this->httpClient->method('send')->willReturn($expectedResponse);
 
         $response = $this->client->getEmails();
 
@@ -170,9 +168,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     public function testCreateEmail()
     {
         $expectedResponse = $this->createExpectedResponse('createContact');
-	    $this->httpClient->expects($this->any())
-		    ->method('send')
-		    ->willReturn($expectedResponse);
+	    $this->httpClient->method('send')->willReturn($expectedResponse);
 
         $data = array(
             'language' => 'en',
@@ -198,9 +194,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     public function testGetContactIdSuccess()
     {
         $expectedResponse = $this->createExpectedResponse('getContactId');
-	    $this->httpClient->expects($this->any())
-		    ->method('send')
-		    ->willReturn($expectedResponse);
+	    $this->httpClient->method('send')->willReturn($expectedResponse);
 
         $response = $this->client->getContactId('3', 'sender@example.com');
 
@@ -211,9 +205,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 	public function testItReturnsContactData()
 	{
 		$expectedResponse = $this->createExpectedResponse('getContactData');
-		$this->httpClient->expects($this->once())
-			->method('send')
-			->willReturn($expectedResponse);
+		$this->httpClient->method('send')->willReturn($expectedResponse);
 
 		$response = $this->client->getContactData(array());
 
@@ -223,9 +215,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 	public function testItCreatesContact()
 	{
 		$expectedResponse = $this->createExpectedResponse('createContact');
-		$this->httpClient->expects($this->once())
-			->method('send')
-			->willReturn($expectedResponse);
+		$this->httpClient->method('send')->willReturn($expectedResponse);
 
 		$data = array(
 			'3'         => 'recipient@example.com',
