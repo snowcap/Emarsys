@@ -16,12 +16,12 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * @var \PHPUnit_Framework_MockObject_MockObject|HttpClient
 	 */
-	private $httpClient;
+	private $stubHttpClient;
 
     protected function setUp()
     {
-	    $this->httpClient = $this->getMock('\Snowcap\Emarsys\HttpClient');
-	    $this->client = new Client($this->httpClient, 'dummy-api-username', 'dummy-api-secret');
+	    $this->stubHttpClient = $this->getMock('\Snowcap\Emarsys\HttpClient');
+	    $this->client = new Client($this->stubHttpClient, 'dummy-api-username', 'dummy-api-secret');
     }
 
 	public function testItAddsFieldsMapping()
@@ -138,9 +138,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     public function testGetEmails()
     {
         $expectedResponse = $this->createExpectedResponse('emails');
-        $this->httpClient->expects($this->any())
-	        ->method('send')
-	        ->willReturn($expectedResponse);
+        $this->stubHttpClient->method('send')->willReturn($expectedResponse);
 
         $response = $this->client->getEmails();
 
@@ -170,9 +168,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     public function testCreateEmail()
     {
         $expectedResponse = $this->createExpectedResponse('createContact');
-	    $this->httpClient->expects($this->any())
-		    ->method('send')
-		    ->willReturn($expectedResponse);
+	    $this->stubHttpClient->method('send')->willReturn($expectedResponse);
 
         $data = array(
             'language' => 'en',
@@ -198,9 +194,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     public function testGetContactIdSuccess()
     {
         $expectedResponse = $this->createExpectedResponse('getContactId');
-	    $this->httpClient->expects($this->any())
-		    ->method('send')
-		    ->willReturn($expectedResponse);
+	    $this->stubHttpClient->method('send')->willReturn($expectedResponse);
 
         $response = $this->client->getContactId('3', 'sender@example.com');
 
@@ -211,9 +205,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 	public function testItReturnsContactData()
 	{
 		$expectedResponse = $this->createExpectedResponse('getContactData');
-		$this->httpClient->expects($this->once())
-			->method('send')
-			->willReturn($expectedResponse);
+		$this->stubHttpClient->method('send')->willReturn($expectedResponse);
 
 		$response = $this->client->getContactData(array());
 
@@ -223,9 +215,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 	public function testItCreatesContact()
 	{
 		$expectedResponse = $this->createExpectedResponse('createContact');
-		$this->httpClient->expects($this->once())
-			->method('send')
-			->willReturn($expectedResponse);
+		$this->stubHttpClient->method('send')->willReturn($expectedResponse);
 
 		$data = array(
 			'3'         => 'recipient@example.com',
@@ -234,6 +224,22 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 		$response = $this->client->createContact($data);
 
 		$this->assertInstanceOf('\Snowcap\Emarsys\Response', $response);
+	}
+
+    /**
+     * @expectedException \Snowcap\Emarsys\Exception\ClientException
+     * @expectedExceptionMessage JSON response could not be decoded, maximum depth reached.
+     */
+	public function testThrowsExceptionIfJsonDepthExceedsLimit()
+	{
+	    $nestedStructure = array();
+	    for ($i=0; $i<511; $i++) {
+	        $nestedStructure = array($nestedStructure);
+        }
+
+        $this->stubHttpClient->method('send')->willReturn(json_encode($nestedStructure));
+
+        $this->client->createContact(array());
 	}
 
 	/**
