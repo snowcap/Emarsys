@@ -40,7 +40,7 @@ class Response
 
         $this->replyCode = $result['replyCode'];
         $this->replyText = $result['replyText'];
-        $this->data = (isset($result['data'])) ? $result['data'] : [];
+        $this->data = isset($result['data']) ? $result['data'] : [];
     }
 
     /**
