@@ -357,12 +357,11 @@ class Client
     /**
      * Returns a list of contact lists which can be used as recipient source for the email.
      *
-     * @param array $data
      * @return Response
      */
-    public function getContactList(array $data)
+    public function getContactList()
     {
-        return $this->send(HttpClient::GET, 'contactlist', $data);
+        return $this->send(HttpClient::GET, 'contactlist');
     }
 
     /**
