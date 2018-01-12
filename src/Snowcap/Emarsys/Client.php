@@ -240,7 +240,7 @@ class Client
 	        $contact = $this->mapFieldsToIds($contact);
 	    }
         }
-    	
+
         return $this->send(HttpClient::POST, 'contact', $this->mapFieldsToIds($data));
     }
 
@@ -257,7 +257,7 @@ class Client
                 $contact = $this->mapFieldsToIds($contact);
             }
         }
-        
+
         return $this->send(HttpClient::PUT, 'contact' . ($createIfNotExists ? '/?create_if_not_exists=1' : ''), $this->mapFieldsToIds($data));
     }
 
@@ -712,7 +712,7 @@ class Client
     {
         return $this->send(HttpClient::POST, 'source/create', $data);
     }
-    
+
     /**
     * creates custom field in your Emarsys account
     *
@@ -725,7 +725,51 @@ class Client
     {
         return $this->send(HttpClient::POST, 'field', array('name'=>$name, 'application_type'=>$type));
     }
-    
+
+    /**
+     * @param $filterId
+     * @return Response
+     * @throws ServerException
+     */
+    public function getSegmentContactCriteria($filterId) {
+        return $this->send(HttpClient::GET, sprintf('filter/%s/contact_criteria', $filterId));
+    }
+
+    /**
+     * @param $filterId
+     * @return Response
+     * @throws ServerException
+     */
+    public function getSegmentCriteria($filterId) {
+        return $this->send(HttpClient::GET, sprintf('filter/%s/criteria', $filterId));
+    }
+
+    /**
+     * @param $filterId
+     * @return Response
+     * @throws ServerException
+     */
+    public function getCombinedSegment($filterId) {
+        return $this->send(HttpClient::GET, sprintf('combinedsegments/%s', $filterId));
+    }
+
+    /**
+     * See https://help.emarsys.com/hc/en-us/articles/115004494413-Unsubscribing-a-Contact-from-an-Email-Campaign
+     *
+     * @param $emailId
+     * @param $userId
+     * @param $launchListId
+     * @return Response
+     * @throws ServerException
+     */
+    public function unsubscribeFromEmailCampaign($emailId, $launchListId, $userId) {
+        return $this->send(HttpClient::POST, 'unsubscribe', [
+            'launch_list_id' => $launchListId,
+            'email_id' => $emailId,
+            'contact_uid' => $userId
+        ]);
+    }
+
     /**
      * @param string $method
      * @param string $uri
