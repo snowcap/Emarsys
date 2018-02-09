@@ -763,7 +763,7 @@ class Client
      * @throws ServerException
      */
     public function unsubscribeFromEmailCampaign($emailId, $launchListId, $userId) {
-        return $this->send(HttpClient::POST, 'unsubscribe', [
+        return $this->send(HttpClient::POST, 'email/unsubscribe', [
             'launch_list_id' => $launchListId,
             'email_id' => $emailId,
             'contact_uid' => $userId
