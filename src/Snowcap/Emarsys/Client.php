@@ -820,6 +820,10 @@ class Client
             }
         }
 
+        if (is_array($responseArray) === false) {
+            throw new ServerException("JSON response is not an array:\n" . $responseArray);
+        }
+
         return new Response($responseArray);
     }
 
