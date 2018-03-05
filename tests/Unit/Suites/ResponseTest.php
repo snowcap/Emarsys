@@ -43,6 +43,14 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals('OK', $result->getReplyText());
 	}
 
+	public function testItResponseWithoutData()
+	{
+		$expectedResponse = $this->createExpectedResponse('insertRecord');
+		$result = new Response($expectedResponse);
+
+		$this->assertEmpty($result->getData());
+	}
+
 	/**
      * @param string $fileName
      * @return mixed
