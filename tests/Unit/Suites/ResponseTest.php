@@ -1,14 +1,14 @@
 <?php
 
-namespace Snowcap\Emarsys;
+namespace Emarsys;
 
 /**
- * @covers \Snowcap\Emarsys\Response
+ * @covers \Emarsys\Response
  */
 class ResponseTest extends \PHPUnit_Framework_TestCase
 {
 	/**
-	 * @expectedException \Snowcap\Emarsys\Exception\ClientException
+	 * @expectedException \Emarsys\Exception\ClientException
 	 * @expectedExceptionMessage Invalid result structure
 	 */
 	public function testItThrowsClientException()

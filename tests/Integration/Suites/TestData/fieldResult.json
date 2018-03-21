@@ -1,0 +1,16 @@
+{
+  "replyCode": 0,
+  "replyText": "OK",
+  "data": [
+    {
+      "id": "0",
+      "name": "Interests",
+      "application_type": "interests"
+    },
+    {
+      "id": "1",
+      "name": "First Name",
+      "application_type": "shorttext"
+    }
+  ]
+}

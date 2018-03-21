@@ -1,9 +1,9 @@
 <?php
 
-namespace Snowcap\Emarsys\Exception;
+namespace Emarsys\Exception;
 
 
 class ClientException extends \Exception
 {
 
-} 
+}

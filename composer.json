@@ -1,24 +1,34 @@
 {
     "name": "snowcap/emarsys",
     "description": "Emarsys RestFull API client",
+	"license": "MIT",
+    "authors": [
+      {
+        "name": "Jérôme Poskin",
+        "email": "jerome@snowcap.be"
+      },
+      {
+        "name": "Michael Müller",
+        "email": "michael.mueller@invia.de"
+      }
+    ],
     "require": {
-        "php": ">=5.3.3",
-        "lib-curl": "*"
+        "php": ">=5.6",
+        "lib-curl": "*",
+        "guzzlehttp/guzzle": "^6"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.*"
+        "phpunit/phpunit": "5.*"
     },
     "autoload": {
         "psr-0": {
-            "Snowcap\\Emarsys": "src/"
+            "Emarsys": "src/"
         }
     },
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Jérôme Poskin",
-            "email": "jerome@snowcap.be"
-        }
-    ],
-    "minimum-stability": "dev"
+    "archive": {
+      "exclude": [
+        ".gitignore",
+        "/tests"
+      ]
+    }
 }
