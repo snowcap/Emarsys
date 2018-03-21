@@ -16,7 +16,7 @@ The recommended way to install Emarsys is through [Composer](http://getcomposer.
 curl -sS https://getcomposer.org/installer | php
 
 # Add Emarsys as a dependency
-php composer.phar require flightadmin/emarsys:*
+php composer.phar require snowcap/emarsys:*
 ```
 
 After installing, you need to require Composer's autoloader:

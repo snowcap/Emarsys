@@ -1,7 +1,12 @@
 {
-    "name": "flightadmin/emarsys-client",
+    "name": "snowcap/emarsys",
     "description": "Emarsys RestFull API client",
+	"license": "MIT",
     "authors": [
+      {
+        "name": "Jérôme Poskin",
+        "email": "jerome@snowcap.be"
+      },
       {
         "name": "Michael Müller",
         "email": "michael.mueller@invia.de"
