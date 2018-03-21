@@ -1,7 +1,7 @@
 Emarsys, PHP HTTP client for Emarsys webservice
 ================================================
 
-Emarsys is a PHP HTTP client based on the official Emarsys web service documentation.
+Emarsys is a PHP HTTP client based on the official Emarsys web service documentation and based on 
 
 At the time of writing, __only methods related to contacts are production ready__.
 
@@ -16,7 +16,7 @@ The recommended way to install Emarsys is through [Composer](http://getcomposer.
 curl -sS https://getcomposer.org/installer | php
 
 # Add Emarsys as a dependency
-php composer.phar require snowcap/emarsys:*
+php composer.phar require flightadmin/emarsys:*
 ```
 
 After installing, you need to require Composer's autoloader:
@@ -27,14 +27,13 @@ require 'vendor/autoload.php';
 
 ### Basics
 
-To use the client, you need to instantiate a new one with your credentials. You also need to create an HTTP client and inject it into Emarsys Client. Snowcap/Emarsys is shipped with cURL HTTP client but it can be replaced with any other custom implementation.
+To use the client, you need to instantiate a new one with your credentials. Emarsys is shipped with Guzzle HTTP client.
 
 ```php
-define('EMARSYS_API_USERNAME', 'your_username');
-define('EMARSYS_API_SECRET', 'your_secret');
+$username = 'your_username';
+$secret = 'your_secret';
 
-$httpClient = new CurlClient();
-$client = new Client($httpClient, EMARSYS_API_USERNAME, EMARSYS_API_SECRET);
+$client = new \Emarsys\Client($username, $secret);
 ```
 
 At this point, you have access to all the methods implemented by the Emarsys API
@@ -50,19 +49,29 @@ $response = $client->createContact(array(3 => 'example@example.com'));
 
 // Create a more complex contact
 $response = $client->createContact(array(
-    'email' => 'johndoe@gmail.com',
-    'gender' => $client->getChoiceId('gender', 'male'),
+    'email'      => 'johndoe@gmail.com',
+    'gender'     => $client->getChoiceId('gender', 'male'),
     'salutation' => $client->getChoiceId('salutation', 'mr'),
-    'firstName' => 'John',
-    'lastName' => 'Doe',
-    'birthDate' => '2014-03-27',
-    'address' => 'Forgotten street 85B',
-    'zip' => '1000',
-    'city' => 'Brussels',
-    'country' => 17,
-    'language' => 3,
+    'firstName'  => 'John',
+    'lastName'   => 'Doe',
+    'birthDate'  => '2014-03-27',
+    'address'    => 'Forgotten street 85B',
+    'zip'        => '1000',
+    'city'       => 'Brussels',
+    'country'    => 17,
+    'language'   => 3,
 ));
 ```
+### GuzzleClient
+
+Emarsys is shipped with the Guzzle HTTP client. You can pass your configured guzzleclient as the third parameter while creating 
+the emarsys client. This is the most time only needed for tests or set specific configurations. Don't pass a baseUrl into your 
+own client, this one should pass as fourth parameter.
+
+### BaseUrl
+
+The Url of the client is set to ```https://api.emarsys.net/api/v2/```. 
+While creating the client you can pass a other url as the fourth parameter.  
 
 ### Custom field mapping
 
@@ -75,7 +84,7 @@ But dealing with IDs is not always the easiest way to work.
 So, extra methods have been implemented to handle custom mapping.
 
 First of all, a default (non-exhaustive) mapping has been set for the Emarsys pre-defined fields.
-You can find it in `src/Snowcap/Emarsys/ini/fields.ini`
+You can find it in `src/Emarsys/ini/fields.ini`
 
 But you can add your own by calling :
 
@@ -101,10 +110,10 @@ $fieldName= $client->getFieldName(1);
 // will return 'firstName';
 ```
 
-Last but not least, you can completely override the default mappings by passing an array as the third argument of the constructor.
+Last but not least, you can completely override the default mappings by passing an array as the fifth argument of the constructor.
 
 ```php
-$client = new Client(EMARSYS_API_USERNAME, EMARSYS_API_SECRET, array('firstName' => 1, 'lastName' => 2));
+$client = new Client($username, $secret, null, array('firstName' => 1, 'lastName' => 2));
 ```
 
 You just have to refer to the official Emarsys documentation or the `getFields()` method to identify the right IDs.
@@ -120,7 +129,7 @@ But dealing with IDs is still not the easiest way to work.
 So, extra methods have been implemented to handle custom mapping.
 
 First of all, a default (non-exhaustive) mapping has been set for the Emarsys pre-defined field choices.
-You can find it in `src/Snowcap/Emarsys/ini/choices.ini`
+You can find it in `src/Emarsys/ini/choices.ini`
 
 But you can add your own by calling :
 
@@ -144,10 +153,10 @@ $choiceName= $client->getChoiceName('gender', 1);
 // will return 'male';
 ```
 
-You can of course override  completely the default mappings by passing an array as the fourth argument of the constructor.
+You can of course override it completely the default mappings by passing an array as the sixth argument of the constructor.
 
 ```php
-$client = new Client(EMARSYS_API_USERNAME, EMARSYS_API_SECRET, array(), array('gender' => array('male' => 1, 'female' => 2)));
+$client = new Client($username, $secret, null, null, [], array('gender' => array('male' => 1, 'female' => 2)));
 ```
 
 You just have to refer to the official Emarsys documentation or the `getFieldChoices()` method to identify the right IDs.
