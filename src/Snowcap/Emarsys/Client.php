@@ -261,6 +261,21 @@ class Client
         return $this->send(HttpClient::PUT, 'contact' . ($createIfNotExists ? '/?create_if_not_exists=1' : ''), $this->mapFieldsToIds($data));
     }
 
+
+
+    /**
+     * Creates or updates a segment
+     *
+     * @param array $data
+     * @return Response
+     */
+    public function createSegment(array $data)
+    {
+        $this->mapSegmentSchemaToIds($data);
+        return $this->send(HttpClient::PUT, 'filter', $data);
+    }
+
+
     /**
      * Returns the internal ID of a contact specified by its external ID.
      *
@@ -779,6 +794,9 @@ class Client
      */
     protected function send($method = 'GET', $uri, array $body = array())
     {
+        // Uncomment for diagnostic information
+        // echo('EMARSYS REQ:' .  date("Y-m-d H:i:s") . ':' . $uri . "\n");
+
 	    $headers = array('Content-Type: application/json', 'X-WSSE: ' . $this->getAuthenticationSignature());
 	    $uri = $this->baseUrl . $uri;
 
@@ -850,6 +868,57 @@ class Client
         }
 
         return $mappedData;
+    }
+
+    /**
+     * Replace array values for field and value with their emarsys ids
+     *
+     * Note field must appear before value
+     * @param array $data
+     *
+     */
+    private function mapSegmentSchemaToIds(array &$data)
+    {
+        $lastFieldId = null;
+        $lastFieldName = null;
+
+        array_walk_recursive($data,function (&$item, $key) use (&$lastFieldId, &$lastFieldName) {
+            if ('field' === $key) {
+
+                if (!is_numeric($item)) {
+                    $lastFieldName = $item;
+                    $item = $this->getFieldId($item);
+                    $lastFieldId = $item;
+                } else {
+                    $item = (int) $item;
+                }
+
+            } elseif ('value' === $key) {
+
+                /**
+                 * Values for criteria must have field name before value name in definition for this method to work:
+                 *
+                 * ```php
+                 * $childArrayValues[] = [
+                 * "type" => "criteria",
+                 * "field" => $newsletterTypeName,
+                 * "operator" => "equals",
+                 * "value" => "N",
+                 * ];
+                 *
+                 * ```
+                 */
+                if (empty($lastFieldId)) {
+                    throw new \InvalidArgumentException('Empty field id. Field must appear before value.');
+                }
+
+                if (isset($this->choicesMapping[$lastFieldName])) {
+                    $item =  $this->getChoiceId($lastFieldName, $item);
+                    $lastFieldId = null;
+                    $lastFieldName = null;
+                }
+            }
+        });
     }
 
     /**

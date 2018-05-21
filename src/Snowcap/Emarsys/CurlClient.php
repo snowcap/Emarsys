@@ -16,6 +16,9 @@ class CurlClient implements HttpClient
 	 */
 	public function send($method, $uri, array $headers = array(), array $body = array())
 	{
+	    // Set to true to output received headers
+	    $debugCurlHeaders = false;
+
 		$ch = curl_init();
 		$uri = $this->updateUri($method, $uri, $body);
 
@@ -28,14 +31,40 @@ class CurlClient implements HttpClient
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
+		if ($debugCurlHeaders) {
+            $headers = [];
+
+            // this function is called by curl for each header received
+            curl_setopt($ch, CURLOPT_HEADERFUNCTION,
+                function ($curl, $header) use (&$headers) {
+                    $len = strlen($header);
+                    $header = explode(':', $header, 2);
+                    if (count($header) < 2) // ignore invalid headers
+                        return $len;
+
+                    $name = trim($header[0]);
+                    if (!array_key_exists($name, $headers))
+                        $headers[$name] = [trim($header[1])];
+                    else
+                        $headers[$name][] = trim($header[1]);
+
+                    return $len;
+                }
+            );
+        }
+
 		$output = curl_exec($ch);
+
+		if ($debugCurlHeaders) {
+            var_dump($headers);
+        }
 
 		if (false === $output) {
 			$message = 'Curl error "'.curl_error($ch)."\" \nCurl error number ".curl_errno($ch)." see http://curl.haxx.se/libcurl/c/libcurl-errors.html";
 			curl_close($ch);
 			throw new ClientException($message);
 		}
-		
+
 		curl_close($ch);
 
 		return $output;
