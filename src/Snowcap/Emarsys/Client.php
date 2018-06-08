@@ -56,15 +56,19 @@ class Client
     /**
      * @param HttpClient $client HTTP client implementation
      * @param string $username The username requested by the Emarsys API
-     * @param string $secret The secret requested by the Emarsys API
-     * @param string $baseUrl Overrides the default baseUrl if needed
-     * @param array $fieldsMap Overrides the default fields mapping if needed
-     * @param array $choicesMap Overrides the default choices mapping if needed
+     * @param string $secret     The secret requested by the Emarsys API
+     * @param string $baseUrl    Overrides the default baseUrl if needed
+     * @param array  $fieldsMap  Overrides the default fields mapping if needed
+     * @param array  $choicesMap Overrides the default choices mapping if needed
      */
     public function __construct(
-        HttpClient $client, $username, $secret, $baseUrl = null, $fieldsMap = array(), $choicesMap = array()
-    )
-    {
+        HttpClient $client,
+        $username,
+        $secret,
+        $baseUrl = null,
+        $fieldsMap = array(),
+        $choicesMap = array()
+    ) {
         $this->client = $client;
         $this->username = $username;
         $this->secret = $secret;
@@ -218,6 +222,8 @@ class Client
      * Returns a list of condition rules.
      *
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getConditions()
     {
@@ -234,6 +240,8 @@ class Client
      *  );
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function createContact(array $data)
     {
@@ -247,6 +255,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function updateContact(array $data)
     {
@@ -261,6 +271,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function updateContactAndCreateIfNotExists(array $data)
     {
@@ -274,6 +286,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function deleteContact(array $data)
     {
@@ -285,8 +299,9 @@ class Client
      *
      * @param string $fieldId
      * @param string $fieldValue
-     * @throws Exception\ClientException
      * @return int
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getContactId($fieldId, $fieldValue)
     {
@@ -306,6 +321,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getContactChanges(array $data)
     {
@@ -317,6 +334,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getContactHistory(array $data)
     {
@@ -337,6 +356,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getContactData(array $data)
     {
@@ -348,6 +369,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getContactRegistrations(array $data)
     {
@@ -359,6 +382,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getContactList(array $data)
     {
@@ -370,6 +395,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function createContactList(array $data)
     {
@@ -381,6 +408,8 @@ class Client
      *
      * @param string $listId
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function deleteContactList($listId)
     {
@@ -393,6 +422,8 @@ class Client
      * @param string $listId
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function addContactsToContactList($listId, array $data)
     {
@@ -405,6 +436,8 @@ class Client
      * @param string $listId
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function removeContactsFromContactList($listId, array $data)
     {
@@ -417,6 +450,8 @@ class Client
      * @param string $listId
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getContactsFromContactList($listId, array $data)
     {
@@ -429,6 +464,8 @@ class Client
      * @param int $contactId
      * @param int $listId
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      * @link http://documentation.emarsys.com/resource/developers/endpoints/contacts/check-a-contact-in-a-contact-list/
      */
     public function checkContactInList($contactId, $listId)
@@ -442,6 +479,8 @@ class Client
      * @param int|null $status
      * @param int|null $contactList
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getEmails($status = null, $contactList = null)
     {
@@ -480,6 +519,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function createEmail(array $data)
     {
@@ -492,6 +533,8 @@ class Client
      * @param string $emailId
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getEmail($emailId, array $data)
     {
@@ -504,6 +547,8 @@ class Client
      * @param string $emailId
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function launchEmail($emailId, array $data)
     {
@@ -516,6 +561,8 @@ class Client
      * @param string $emailId
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function previewEmail($emailId, array $data)
     {
@@ -528,6 +575,8 @@ class Client
      * @param string $emailId
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getEmailResponseSummary($emailId, array $data)
     {
@@ -540,6 +589,8 @@ class Client
      * @param string $emailId
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function sendEmailTest($emailId, array $data)
     {
@@ -552,6 +603,8 @@ class Client
      * @param string $emailId
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getEmailUrl($emailId, array $data)
     {
@@ -563,6 +616,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getEmailDeliveryStatus(array $data)
     {
@@ -574,6 +629,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getEmailLaunches(array $data)
     {
@@ -585,6 +642,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getEmailResponses(array $data)
     {
@@ -596,6 +655,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function unsubscribeEmail(array $data)
     {
@@ -607,6 +668,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getEmailCategories(array $data)
     {
@@ -617,6 +680,8 @@ class Client
      * Returns a list of external events which can be used in program s .
      *
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getEvents()
     {
@@ -629,6 +694,8 @@ class Client
      * @param string $eventId
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function triggerEvent($eventId, array $data)
     {
@@ -640,6 +707,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getExportStatus(array $data)
     {
@@ -650,6 +719,8 @@ class Client
      * Returns a list of fields (including custom fields and vouchers) which can be used to personalize content.
      *
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getFields()
     {
@@ -661,6 +732,8 @@ class Client
      *
      * @param string $fieldId Field ID or custom field name (available in fields mapping)
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getFieldChoices($fieldId)
     {
@@ -672,6 +745,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getFiles(array $data)
     {
@@ -683,6 +758,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function uploadFile(array $data)
     {
@@ -694,6 +771,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getSegments(array $data)
     {
@@ -705,6 +784,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getFolders(array $data)
     {
@@ -716,6 +797,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getForms(array $data)
     {
@@ -726,6 +809,8 @@ class Client
      * Returns a list of languages which you can use in email creation.
      *
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getLanguages()
     {
@@ -736,6 +821,8 @@ class Client
      * Returns a list of sources which can be used for creating contacts.
      *
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function getSources()
     {
@@ -747,6 +834,8 @@ class Client
      *
      * @param string $sourceId
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function deleteSource($sourceId)
     {
@@ -758,6 +847,8 @@ class Client
      *
      * @param array $data
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function createSource(array $data)
     {
@@ -765,12 +856,13 @@ class Client
     }
 
     /**
-     * creates custom field in your Emarsys account
+     * Creates custom field in your Emarsys account
      *
      * @param string $name
      * @param string $type shorttext|longtext|largetext|date|url|numeric
-     *
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function createCustomField($name, $type)
     {
@@ -778,12 +870,13 @@ class Client
     }
 
     /**
-     * Adds list of emails and domains to blacklist
+     * Adds a list of emails and domains to the blacklist
      *
      * @param array $emails
      * @param array $domains
-     *
      * @return Response
+     * @throws ClientException
+     * @throws ServerException
      */
     public function addBlacklistEntries(array $emails = array(), array $domains = array())
     {
@@ -791,6 +884,8 @@ class Client
     }
 
     /**
+     * Send an HTTP request
+     *
      * @param string $method
      * @param string $uri
      * @param array $body
@@ -861,6 +956,7 @@ class Client
      *
      * @param array $data
      * @return array
+     * @throws ClientException
      */
     private function mapFieldsToIds(array $data)
     {
@@ -915,7 +1011,7 @@ class Client
             return $data;
         }
 
-        return array_merge($data, ['contacts' => array_map([$this, 'mapFieldsToIds'], $data['contacts'])]);
+        return array_merge($data, array('contacts' => array_map(array($this, 'mapFieldsToIds'), $data['contacts'])));
     }
 
 }
