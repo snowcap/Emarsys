@@ -4,55 +4,83 @@ namespace Snowcap\Emarsys;
 
 use Snowcap\Emarsys\Exception\ClientException;
 
+/**
+ * A cURL HTTP client implementation
+ */
 class CurlClient implements HttpClient
 {
-	/**
-	 * @param string $method
-	 * @param string $uri
-	 * @param string[] $headers
-	 * @param array $body
-	 * @return string
-	 * @throws ClientException
-	 */
-	public function send($method, $uri, array $headers = array(), array $body = array())
-	{
-		$ch = curl_init();
-		$uri = $this->updateUri($method, $uri, $body);
+    /**
+     * An array of predefined cURL options
+     *
+     * @var array
+     */
+    private $curlOptions = array();
 
-		if ($method != self::GET) {
-			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
-		}
+    /**
+     * CurlClient constructor.
+     * @param array $curlOptions additional options for cURL (timeouts, etc.)
+     */
+    public function __construct(array $curlOptions = array())
+    {
+        $this->curlOptions = $curlOptions;
+    }
 
-		curl_setopt($ch, CURLOPT_URL, $uri);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    /**
+     * Send an HTTP request
+     *
+     * @param string   $method
+     * @param string   $uri
+     * @param string[] $headers
+     * @param array    $body
+     * @return string
+     * @throws ClientException
+     */
+    public function send($method, $uri, array $headers = array(), array $body = array())
+    {
+        $ch  = curl_init();
+        $uri = $this->updateUri($method, $uri, $body);
 
-		$output = curl_exec($ch);
+        if ($method != self::GET) {
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
+        }
 
-		if (false === $output) {
-			$message = 'Curl error "'.curl_error($ch)."\" \nCurl error number ".curl_errno($ch)." see http://curl.haxx.se/libcurl/c/libcurl-errors.html";
-			curl_close($ch);
-			throw new ClientException($message);
-		}
-		
-		curl_close($ch);
+        foreach ($this->curlOptions as $optionCode => $optionValue) {
+            curl_setopt($ch, $optionCode, $optionValue);
+        }
 
-		return $output;
-	}
+        curl_setopt($ch, CURLOPT_URL, $uri);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-	/**
-	 * @param string $method
-	 * @param string $uri
-	 * @param array $body
-	 * @return string
-	 */
-	private function updateUri($method, $uri, array $body)
-	{
-		if (self::GET == $method) {
-			$uri .= '/' . http_build_query($body);
-		}
+        $output = curl_exec($ch);
+        if (false === $output) {
+            $message = sprintf(
+                "Curl error \"%s\"\n Curl error number %d see http://curl.haxx.se/libcurl/c/libcurl-errors.html",
+                curl_error($ch),
+                curl_errno($ch)
+            );
+            curl_close($ch);
+            throw new ClientException($message);
+        }
 
-		return $uri;
-	}
+        curl_close($ch);
+
+        return $output;
+    }
+
+    /**
+     * @param string $method
+     * @param string $uri
+     * @param array  $body
+     * @return string
+     */
+    private function updateUri($method, $uri, array $body)
+    {
+        if (self::GET == $method) {
+            $uri .= '/' . http_build_query($body);
+        }
+
+        return $uri;
+    }
 }
