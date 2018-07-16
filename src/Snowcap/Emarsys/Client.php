@@ -759,6 +759,18 @@ class Client
         return $this->send(HttpClient::GET, sprintf('filter/%s/criteria', $filterId));
     }
 
+
+    /**
+     * @param $filterId
+     * @param int $offset
+     * @param int $limit
+     * @return Response
+     * @throws ServerException
+     */
+    public function getSegmentContacts($filterId, $offset, $limit) {
+        return $this->send(HttpClient::GET, sprintf('filter/%d/contacts/?offset=%d&limit=%d', intval($filterId), intval($offset), intval($limit)));
+    }
+
     /**
      * @param $filterId
      * @return Response
