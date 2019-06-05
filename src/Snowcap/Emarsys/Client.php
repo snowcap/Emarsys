@@ -7,6 +7,9 @@ use Snowcap\Emarsys\Exception\ServerException;
 
 class Client
 {
+    /** Skip fields that aren't mapped and drop them from mapped data (for debugging) */
+    const SKIP_UNKNOWN_FIELDS = true;
+
     const EMAIL_STATUS_IN_DESIGN = 1;
     const EMAIL_STATUS_TESTED = 2;
     const EMAIL_STATUS_LAUNCHED = 3;
@@ -140,7 +143,11 @@ class Client
         }
 
         if (!isset($this->fieldsMapping[$field])) {
+            if (!self::SKIP_UNKNOWN_FIELDS) {
 	        throw new ClientException(sprintf('Unrecognized field name "%s"', $field));
+            } else {
+                return null;
+            }
         }
 
 	    return (int)$this->fieldsMapping[$field];
@@ -214,10 +221,8 @@ class Client
 
     /**
      * Returns a list of condition rules.
-     *
-     * @return Response
      */
-    public function getConditions()
+    public function getConditions(): Response
     {
         return $this->send(HttpClient::GET, 'condition');
     }
@@ -261,7 +266,35 @@ class Client
         return $this->send(HttpClient::PUT, 'contact' . ($createIfNotExists ? '/?create_if_not_exists=1' : ''), $this->mapFieldsToIds($data));
     }
 
+    /**
+     * Merges two contacts identified by key id
+     * Example :
+     *  $data = array(
+     *      'key_id' => '3',
+     *      'source_key_value' => 'sourcerecipient@example.com',
+     *      'target_key_value' => 'targetrecipient@example.com',
+     *  );
+     */
+    public function mergeContact(array $data, bool $deleteSource = false, array $mergeRules = []): ?Response
+    {
+        // Can be 'id' for internal emarsys contact id
+        if (!isset($data['key_id'])) {
+            return null;
+        }
 
+        if (!isset($data['source_key_value'])) {
+            return null;
+        }
+
+        if (!isset($data['target_key_value'])) {
+            return null;
+        }
+
+        $data['delete_source'] = $deleteSource;
+        $data['merge_rules'] = $mergeRules;
+
+        return $this->send(HttpClient::POST, 'contact/merge', $data);
+    }
 
     /**
      * Creates or updates a segment
@@ -869,11 +902,19 @@ class Client
                 $fieldName = $this->getFieldName($fieldId);
             } else {
                 $fieldId = $this->getFieldId($name);
+                if (self::SKIP_UNKNOWN_FIELDS && null === $fieldId) {
+                    continue;
+                }
+
                 $fieldName = $name;
             }
 
             if (isset($this->choicesMapping[$fieldName])) {
                 $value = $this->getChoiceId($fieldName,$value);
+
+                if (self::SKIP_UNKNOWN_FIELDS && null === $fieldId) {
+                    continue;
+                }
             }
 
             $mappedData[$fieldId] = $value;
