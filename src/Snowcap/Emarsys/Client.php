@@ -255,12 +255,16 @@ class Client
      * @param array $data
      * @return Response
      */
-    public function updateContact(array $data, $createIfNotExists = false)
+    public function updateContact(array $data, $createIfNotExists = false, $keyId = null)
     {
         if (isset($data['contacts']) && is_array($data['contacts'])){
             foreach($data['contacts'] as &$contact){
                 $contact = $this->mapFieldsToIds($contact);
             }
+        }
+
+        if (null !== $keyId) {
+            $data['key_id'] = $this->getFieldId($keyId);
         }
 
         return $this->send(HttpClient::PUT, 'contact' . ($createIfNotExists ? '/?create_if_not_exists=1' : ''), $this->mapFieldsToIds($data));
@@ -311,23 +315,24 @@ class Client
 
     /**
      * Returns the internal ID of a contact specified by its external ID.
-     *
-     * @param string $fieldId
-     * @param string $fieldValue
      * @throws Exception\ClientException
-     * @return Response
+     * @throws ServerException
      */
-    public function getContactId($fieldId, $fieldValue)
+    public function getContactId(int $fieldId, string $fieldValue): ?string
     {
         $response = $this->send(HttpClient::GET, sprintf('contact/%s=%s', $fieldId, $fieldValue));
 
         $data = $response->getData();
 
+        if (Response::REPLY_CODE_CONTACT_NOT_FOUND === $response->getReplyCode()) {
+            return null;
+        }
+
         if (isset($data['id'])) {
             return $data['id'];
         }
 
-        throw new ClientException('Missing "id" in response');
+        throw new ClientException(sprintf('Missing "id" in response. Reply code: %s %s', $response->getReplyCode(), $response->getReplyText()));
     }
 
     /**
