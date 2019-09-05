@@ -705,15 +705,106 @@ class Client
     /**
      * Fetches the status data of an export.
      *
-     * @param array $data
+     * @param string $exportId
      * @return Response
      * @throws ClientException
      * @throws ServerException
      */
-    public function getExportStatus(array $data)
+    public function getExportStatus($exportId)
     {
-        return $this->send(HttpClient::GET, 'export', $data);
+        return $this->getOnlySuccessResponse(HttpClient::GET, sprintf('export/%s', $exportId));
     }
+
+    /**
+     * @param $exportId
+     * @param int $times
+     * @param int $sleep
+     * @return bool
+     * @throws ClientException
+     * @throws ServerException
+     */
+    public function pollExportStatus($exportId, $times = 30, $sleep = 3)
+    {
+        $isDone = false;
+        while (--$times) {
+            $data = $this->getExportStatus($exportId)->getData();
+            if ('done' === $data['status']) {
+                $isDone = true;
+                break;
+            }
+            sleep($sleep);
+        }
+
+        if (!$isDone) {
+            throw new ClientException('File is not ready');
+        }
+
+        return true;
+    }
+
+    /**
+     * Exports the specified fields of contacts from a segment as a file
+     *
+     * @param array $data
+     * @return int
+     * @throws ClientException
+     * @throws ServerException
+     */
+    public function exportSegment(array $data)
+    {
+        $response = $this->getOnlySuccessResponse(HttpClient::POST, 'export/filter', $data);
+        $data = $response->getData();
+        if (!array_key_exists('id', $data)) {
+            throw new ClientException(sprintf('Key ID is not exist, response %s', json_encode($response->getData())));
+        }
+
+        $exportId = $data['id'];
+        if (0 === $exportId) {
+            throw new ClientException(sprintf('Export ID %s is not correct', $response->getData()));
+        }
+
+        return $exportId;
+    }
+
+    /**
+     * Get segment`s data from file
+     *
+     * @param array $data
+     * @return string
+     * @throws ClientException
+     * @throws ServerException
+     */
+    public function runExportSegmentCSV(array $data)
+    {
+        $exportId = $this->exportSegment($data);
+        $this->pollExportStatus($exportId);
+
+        return $this->downloadExportedCSV($exportId);
+    }
+
+    /**
+     * Returns a CSV file once the export job is finished
+     *
+     * @param string $exportId
+     * @param array $body
+     * @return string
+     * @throws ClientException
+     * @throws ServerException
+     */
+    public function downloadExportedCSV($exportId, array $body = array())
+    {
+        $headers = array('Content-Type: application/json', 'X-WSSE: ' . $this->getAuthenticationSignature());
+        $uri = $this->baseUrl . sprintf('export/%s/data', $exportId);
+
+        try {
+            $response = $this->client->send(HttpClient::GET, $uri, $headers, $body);
+        } catch (\Exception $e) {
+            throw new ServerException($e->getMessage());
+        }
+
+        return $response;
+    }
+
 
     /**
      * Returns a list of fields (including custom fields and vouchers) which can be used to personalize content.
@@ -920,6 +1011,26 @@ class Client
         }
 
         return new Response($responseArray);
+    }
+
+    /**
+     * Decorated the send method with check response code
+     *
+     * @param string $method
+     * @param $uri
+     * @param array $body
+     * @return Response
+     * @throws ClientException
+     * @throws ServerException
+     */
+    protected function getOnlySuccessResponse($method = 'GET', $uri, array $body = array())
+    {
+        $response = $this->send($method, $uri, $body);
+        if (0 !== $response->getReplyCode()) {
+            throw new ServerException(sprintf('Error code response %s, message %s', $response->getReplyCode(), $response->getReplyText()));
+        }
+
+        return $response;
     }
 
     /**
