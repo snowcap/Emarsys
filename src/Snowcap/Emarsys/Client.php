@@ -473,6 +473,28 @@ class Client
         return $this->send(HttpClient::GET, sprintf('contactlist/%s/contacts/%s', $listId, $contactId));
     }
 
+     /**
+     * Generates a list of existing contacts and errors indexed by the specified key identifier.
+     *
+     * Example:
+     *
+     *  $data = array(
+     *      'key_id' => 3, // Contact element used as a key to select the contacts.
+     *                    // To use the internalID, pass "id" to the "keyId" parameter.
+     *      'external_ids' => array('example@example.com', 'example2@example.com'), // Filters the contacts by the values of the specified key field (key_id).
+     *      'get_multiple_ids' => 1, // boolean - Lists all internal contact identifiers if the request matches multiple external identifiers.
+     *  );
+     *
+     * @param array $data
+     * @return Response
+     * @throws ClientException
+     * @throws ServerException
+     */
+    public function checkIds(array $data)
+    {
+        return $this->send(HttpClient::POST, 'contact/checkids', $data);
+    }
+
     /**
      * Returns a list of emails.
      *
