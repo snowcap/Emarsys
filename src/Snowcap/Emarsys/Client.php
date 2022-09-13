@@ -893,8 +893,12 @@ class Client
      * @throws ClientException
      * @throws ServerException
      */
-    protected function send($method = 'GET', $uri, array $body = array())
+    protected function send($method = 'GET', $uri = '', array $body = array())
     {
+        if (empty($uri)) {
+            throw new ServerException('The uri must not be empty.');
+        }
+
         $headers = array('Content-Type: application/json', 'X-WSSE: ' . $this->getAuthenticationSignature());
         $uri = $this->baseUrl . $uri;
 
